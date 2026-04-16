@@ -1,0 +1,22 @@
+name,rarity,effect
+Kronicles Mask,common,Can't be Frozen
+Pudgy Mask,common,Freeze all 3 at the start of battle
+Ket Mask,common,Can't be Bleeding
+Sunstone,common,Increase Damage by 1x for turn 1
+Snake Skull,common,"Any time you deal Poison, deal 2 more"
+Lizard Mask,common,"At the start of battle, Poison all 4"
+Amulet of Yendor,common,Gain 1 additional hp whenever you gain hp
+Noggles,common,"At the end of every battle, Heal 5"
+Turtle Shell,common,"If there are 3 or more Baddies, your first Attack is inflicted on all Baddies"
+Pet Hooligan Mask,common,Decrease Big Baddie Health by 20% at the start of battle
+Adamantaeum,rare,On turn 3 gain 1 Negate Damage and 2 Strength
+Tiny Titan,rare,At the end of every turn Attack the rightmost Baddie 16
+Joker Card,rare,Plus 1x Points multiplier on odd turns
+Bottled Fairy,rare,"If you die, instantly revive to 30% of your max Health, then lose this Trinket"
+Bird Mask,boss,Gain 2 Strength at the start of each turn
+Idol of Immunity,boss,"The first time you would die each battle, retain 1 Health and survive"
+Shiba Mask,boss,Exhaust 1 Curse at the start of each turn
+Delete Button,boss,"If you win within 2 turns, Burn a Side during your loot rewards"
+Greenade,boss,All Poison impacts All Baddies
+Scoring,boss,"If you win within 3 turns, score 7,777 points"
+Quadforce,boss,"At the end of your first 4 turns, re-roll a random die"

@@ -1,0 +1,119 @@
+
+## Watch session started 2026-04-13T13:39:46.190801Z — `d0c9597f-4c50-40ff-b649-aea719a290e2`
+
+
+## Watch session started 2026-04-13T13:41:37.594526Z — `d0c9597f-4c50-40ff-b649-aea719a290e2`
+
+- `13:41:38` **INIT** — inState=`baddie` HP=60/60 TC=5 gold=60 points=0 path=`main`[0] chapter=1
+- `13:43:08` **POINTS** — 0 -> 1240 (+1240)
+- `13:43:10` **GOLD** — 60 -> 74 (+14)
+- `13:43:32` **STATE** — `baddie` -> `map`
+- `13:43:32` **DIE** — die#1: +['Poison 8, Heal 1']
+- `13:43:34` **STATE** — `map` -> `rewindable`
+- `13:43:34` **MOVE** — `main`[0] -> `main`[2]
+- `13:43:36` **STATE** — `rewindable` -> `mystery`
+- `13:43:45` **STATE** — `mystery` -> `map`
+- `13:43:46` **STATE** — `map` -> `rewindable`
+- `13:43:46` **MOVE** — `main`[2] -> `main`[3]
+- `13:43:48` **STATE** — `rewindable` -> `mystery`
+- `13:43:55` **STATE** — `mystery` -> `map`
+- `13:43:57` **DAMAGE** — 60 -> 52 (-8)
+- `13:43:57` **MAX-HP** — 60 -> 56 (-4)
+- `13:43:57` **DIE** — die#1: -['Poison 3']
+- `13:43:58` **STATE** — `map` -> `rewindable`
+- `13:43:58` **MOVE** — `main`[3] -> `main`[4]
+- `13:44:02` **STATE** — `rewindable` -> `baddie`
+- `13:44:21` **DAMAGE** — 52 -> 51 (-1)
+- `13:44:21` **POINTS** — 1240 -> 2550 (+1310)
+- `13:44:23` **GOLD** — 74 -> 89 (+15)
+- `13:44:23` **FOOD+** — 954a7102-95ca-4435-8e51-59021354ff7f
+- `13:44:38` **STATE** — `baddie` -> `map`
+- `13:44:38` **DIE** — die#4: +['(p) Gain 2 Armor at the end of each turn']
+- `13:44:40` **STATE** — `map` -> `rewindable`
+- `13:44:40` **MOVE** — `main`[4] -> `main`[6]
+- `13:44:43` **STATE** — `rewindable` -> `baddie`
+- `13:44:59` **DIE** — die#3: +['(e) Block 10, Freeze All 3', '(p) Gain 2 Armor at the end of each turn'] -['Attack 4', 'Attack 4']
+- `13:44:59` **DIE** — die#4: +['Attack 4', 'Attack 4'] -['(e) Block 10, Freeze All 3', '(p) Gain 2 Armor at the end of each turn']
+- `13:45:20` **DAMAGE** — 51 -> 40 (-11)
+- `13:45:20` **POINTS** — 2550 -> 3980 (+1430)
+- `13:45:21` **GOLD** — 89 -> 103 (+14)
+- `13:45:34` **STATE** — `baddie` -> `map`
+- `13:45:34` **DIE** — die#4: +['(p) Gain 4 Strength at the end of each turn']
+- `13:45:35` **STATE** — `map` -> `rewindable`
+- `13:45:35` **MOVE** — `main`[6] -> `main`[9]
+- `13:45:39` **TC** — 5 -> 3 (-2)
+- `13:45:39` **MOVE** — `main`[9] -> `main`[8]
+- `13:45:40` **STATE** — `rewindable` -> `mystery`
+- `13:46:03` **STATE** — `mystery` -> `map`
+- `13:46:03` **GOLD** — 103 -> 253 (+150)
+- `13:46:03` **DIE** — die#2: +['(e) Exhaust a random other Side on this Dice']
+- `13:46:05` **STATE** — `map` -> `rewindable`
+- `13:46:05` **MOVE** — `main`[8] -> `main`[11]
+- `13:46:08` **TC** — 3 -> 1 (-2)
+- `13:46:08` **MOVE** — `main`[11] -> `main`[10]
+- `13:46:10` **STATE** — `rewindable` -> `campfire`
+- `13:46:28` **STATE** — `campfire` -> `map`
+- `13:46:28` **DIE** — die#3: 
+- `13:46:31` **STATE** — `map` -> `rewindable`
+- `13:46:31` **MOVE** — `main`[10] -> `main`[12]
+- `13:46:33` **STATE** — `rewindable` -> `mystery`
+- `13:46:40` **STATE** — `mystery` -> `map`
+- `13:46:40` **HEAL** — 40 -> 50 (+10)
+- `13:46:40` **TC** — 1 -> 3 (+2)
+- `13:46:40` **POINTS** — 3980 -> 1980 (-2000)
+- `13:46:41` **STATE** — `map` -> `rewindable`
+- `13:46:41` **MOVE** — `main`[12] -> `main`[14]
+- `13:46:43` **STATE** — `rewindable` -> `baddie`
+- `13:47:09` **DAMAGE** — 50 -> 25 (-25)
+- `13:47:09` **GOLD** — 253 -> 267 (+14)
+- `13:47:09` **POINTS** — 1980 -> 4130 (+2150)
+- `13:47:16` **DIE** — die#3: +['Block 18. Score 50 Points']
+- `13:47:18` **STATE** — `baddie` -> `rewindable`
+- `13:47:18` **MOVE** — `main`[14] -> `main`[15]
+- `13:47:19` **STATE** — `rewindable` -> `mystery`
+- `13:47:28` **STATE** — `mystery` -> `map`
+- `13:47:28` **DIE** — die#4: 
+- `13:47:32` **STATE** — `map` -> `rewindable`
+- `13:47:32` **MOVE** — `main`[15] -> `main`[17]
+- `13:47:33` **STATE** — `rewindable` -> `baddie`
+- `13:48:01` **DAMAGE** — 25 -> 22 (-3)
+- `13:48:01` **GOLD** — 267 -> 278 (+11)
+- `13:48:01` **POINTS** — 4130 -> 6670 (+2540)
+- `13:48:10` **DIE** — die#4: +['(e) Poison all 3, 3 times']
+- `13:48:11` **STATE** — `baddie` -> `map`
+- `13:48:13` **STATE** — `map` -> `rewindable`
+- `13:48:13` **MOVE** — `main`[17] -> `main`[21]
+- `13:48:15` **STATE** — `rewindable` -> `map`
+- `13:48:15` **TC** — 3 -> 1 (-2)
+- `13:48:15` **MOVE** — `main`[21] -> `main`[17]
+- `13:48:17` **STATE** — `map` -> `rewindable`
+- `13:48:17` **MOVE** — `main`[17] -> `main`[20]
+- `13:48:18` **STATE** — `rewindable` -> `big-baddie`
+- `13:48:22` **FOOD-** — 954a7102-95ca-4435-8e51-59021354ff7f
+- `13:48:44` **DAMAGE** — 22 -> 6 (-16)
+- `13:48:44` **POINTS** — 6670 -> 12100 (+5430)
+- `13:48:46` **TC** — 1 -> 2 (+1)
+- `13:48:46` **GOLD** — 278 -> 314 (+36)
+- `13:48:46` **FOOD+** — 705da2cf-aa9b-494b-948d-096b0414dc1d
+- `13:48:57` **STATE** — `big-baddie` -> `map`
+- `13:48:57` **MOVE** — `main`[20] -> `main`[21]
+- `13:48:57` **DIE** — die#1: +['(p) Gain 4 Strength at the end of each turn']
+- `13:48:58` **STATE** — `map` -> `rewindable`
+- `13:48:58` **MOVE** — `main`[21] -> `main`[23]
+- `13:49:02` **TC** — 2 -> 0 (-2)
+- `13:49:02` **MOVE** — `main`[23] -> `main`[24]
+- `13:49:03` **STATE** — `rewindable` -> `campfire`
+- `13:49:07` **STATE** — `campfire` -> `map`
+- `13:49:07` **HEAL** — 6 -> 28 (+22)
+- `13:49:09` **STATE** — `map` -> `rewindable`
+- `13:49:09` **MOVE** — `main`[24] -> `main`[25]
+- `13:49:10` **STATE** — `rewindable` -> `big-baddie`
+- `13:49:31` **FOOD-** — 705da2cf-aa9b-494b-948d-096b0414dc1d
+- `13:51:15` **DAMAGE** — 28 -> 27 (-1)
+- `13:51:15` **POINTS** — 12100 -> 14880 (+2780)
+- `13:51:17` **TC** — 0 -> 2 (+2)
+- `13:51:17` **GOLD** — 314 -> 380 (+66)
+- `13:51:17` **TRINKET+** — Lizard Mask
+- `13:51:17` **FOOD+** — 2b418a3d-5da5-4b57-b9a2-01871644be67
+- `13:51:29` **STATE** — `big-baddie` -> `win`
+- `13:51:29` **DIE** — die#1: +['(e) Attack 16. Permanently increase the Attack on this Side by 2']

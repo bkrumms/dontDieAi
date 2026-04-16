@@ -1,0 +1,144 @@
+	A	B	C	D	E	F	G	H	I	J	K	L	M	N	O	P	Q	R	S	T	U	V	W	X	Y	Z
+Loot from the Encounters
+	New Side	Points	Gold	Food	Time Crystals	Trinket	Sticker	Health	Burn	Bones
+Baddie	Yes	Yes	Yes	Chance	Chance	No	No	No	No	No
+Big Baddie	Yes	Yes	Yes	Yes	Chance	No	Yes	No	No	Yes
+Mini Boss Big Baddie	Yes	Yes	Yes	Yes	Yes	Yes	Yes	No	No	Yes
+Obelisk	Yes	Yes	Yes	Chance	Yes	Yes, higher chance at rare	Yes x2	No	No	Yes
+Boss Baddie	Yes, Special	Yes	Yes	No	Yes	Yes, boss	Yes	No	No	No
+Bub's Barter	Yes x6	No	Spend	Yes x2	Yes	Yes x3, 2 common, 1 rare	No	Spend	Yes	No
+Campfire	No	Yes	No	Yes x2	Yes	No	No	Yes	Yes	No
+Loot Die	No	No	Yes	No	No	Yes	Yes	No	No	No
+Mystery Event	Chance	Chance	Chance	Chance	Chance	Chance	Chance	Chance	Chance	No
+New Sides:
+When players win a battle and get loot, they will select 1 Die and then will be presented with 3 options for a New Side to be added to that specific Die. Players can choose to skip, but they can't select a different Die to upgrade
+When players see Side rewards, the Sides are rolled 1 by 1 until all 3 are rolled. Then, they're shown to the player
+The same Side cannot be duplicated in the rewards set - ie, you won't see 2 options that are identical in the set of 3 options
+Some Sides are tagged with a Biome (volcano, swamp, ice cave), but most Sides are non-tagged/normal
+If the player is traversing through a Biome and has the opportunity to add a Side, 2 of the 3 Side slots will have that Biome's tag.
+If the player added a Side in the most recent upgrade for this Die (didn't skip), 1 of the 3 Side slots will match the Biome tag previously selected
+If a slot has no biome tag stipulations, roll 50/50 if the slot will be Neutral or Biome. If Biome, then select randomly from the 3 biome options
+Assess if Biome tags must exist, and which slots they will be on (option 1, 2, or 3, equal odds). Then, roll for Level of the Sides
+There are 3 levels of Sides, roughly equating to their power
+Level 1	Common, good sides that will help build your strategy
+Level 2	Uncommon, great sides that will deal lots of damage or create combos
+Level 3	Rare, unique sides that will form the basis for complex combos and massive damage
+The player will start each Chapter with the following base odds for seeing new Sides
+Level 1	(70 - x)%
+Level 2	30%
+Level 3	(x)%
+Anytime a Level 1 Side is selected (could be up to 3 times per reward...), x increases by 1.
+If Level 3 is ever selected, x drops to 0
+This x counter continues across the whole Chapter. x resets to 0 at the beginning of new Chapters.
+This mechanic ensures players will see Level 3 Sides eventually, but won't be able to spam them.
+There might be two Level 3 sides in a single reward but its quite literally 1/100 chance only when the first slot was selected to be L3. (slot 1 select L3, x->0, slot 2 picks something, x->1, slot 3 has 1% chance of picking L3)
+Once the Level of the Sides are chosen, roll for the specific Side within that Level.
+If the Biome tag was assigned to that slot, only pick from Sides of that Level matching that Biome tag
+Give all Sides within the available options a liklihood score of 1
+If that specific Die has a specific Side already on it, and that Side is in the available options, increase that Side's liklihood score by 1
+If that specific Die has 2 copies of a specific Level 3 Side already on it, drop that Side's liklihood score to 0
+Then do a random draw from the total liklihood, selecting 1 Side. (essentially a liklihood score of 2 has double odds of being selected)
+Once that Side has been selected, it won't get selected again within the same set of 3, so remove it from the available options
+Continue this process until all 3 Sides are selected for the slots. Then show all 3 to the player.
+Boss Baddie loot will ALWAYS result in 3 Level 3 Sides offered with +100 points. All other rules remain the same.
+Food Pool Odds:
+After any Baddie Battle or Obelisk, players will have a dynamic % chance of getting a Food. The run starts with base odds of 20% chance. If they do not get a Food, their chance rises 10% for the next reward. If they do get a Food, their chance decreases 10% for the next reward. This continues for the whole run.
+If user gets a Food from rewards, it will come from:
+Food Pool 1	70%
+Food Pool 2	30%
+If in a Biome, and Food Pool 1 is rolled, roll a 50/50 between Biome Food and Other Food. If Biome Food, choose from the 3 Foods with that Biome tag. If Other Food, choose from all non-Biome Food in Pool 1
+Trinket Pool Odds:
+Common	90%
+Rare	10%
+Boss	*only given at bosses
+Choose rarity first, then select randomly from remaining Trinkets that haven't yet been collected
+If Trinket is earned from an Obelisk, it has a 30% chance of being Rare instead of 10%
+If in a Biome, and Common is rolled, roll a 50/50 between Biome Trinket and Other Trinket. If Biome Trinket, choose from the 2 Trinkets with that Biome tag. If Other Trinket, choose from all non-Biome Trinkets in Common Pool. If Biome Trinket was selected and both Biome Trinkets have been collected, default to Other Trinket (non-Biome Trinkets in Common Pool)
+Time Crystal Odds:
+	0	1	2	3
+After Obelisk or any Stop Fight (including Bosses)	0%	0%	80%	20%
+	0	1	2
+Chapter 1
+After Baddie	90%	10%	0%
+After non-StopFight Big Baddie	0%	70%	30%
+Chapter 2
+After Baddie	85%	15%	0%
+After non-StopFight Big Baddie	0%	60%	40%
+General notes on usage in game:
+Spend an increasing number of Time Crystals to re-roll movement die. Each time the player re-rolls from that same space, the price increases following this sequence (2, 2, 3, 3, 4, 4, 5, 5, etc). Once the player is on a new space, the sequence resets. So the majority of the time the player will pay just 2 Time Crystals to re-roll. This sequence is to prevent spamming.
+Spend Time Crystals during specific Mystery Events to guarantee the outcome you really want
+Bones Distribution
+Gain 1 Bone after defeating any Big Baddie (on path, or in miniboss stopfight), or after an Obelisk
+Gold Distribution Odds
+	Min	Avg	Max
+Baddie	10	15	20
+Big Baddie	30	40	50
+Mid-Chapter Stop Fight*	60	65	70
+Obelisk	65	75	85
+Boss Baddie	80	90	100
+Loot Die	10	30	50
+Use a gaussian distribution when player gets gold reward. Only whole numbers
+Campfires:
+When you enter a campfire encounter, choose one and only one of the following 5 options:
+Rest	40% of max health, rounded down
+Burn	Burn Side
+Food	Get 2 random Food
+Score	Gain 7,000 Points
+Mine	Gain 5 Time Crystals
+Bub's:
+The Items for Sale:
+6 Sides
+3 Trinkets
+2 Food
+3 Time Crystals
+1 Burn
+Shopping Experience:
+When the user is shopping, they place things onto the right side of Bub's scale, and an equal amount of gold falls onto the left (payment) side. The player sees the total shown in number form. The player pays Bub for the full haul at the end. The player can remove things from the scale.
+The player can 'barter' with Bub if they're slightly short on Gold. For each 3 Gold they are short, they can pay with 1 Health
+If they start paying in Health they see their health being rung up if they're short on Gold. They must have a minimum of 1 health when leaving Bub's - they cannot spend all their health.
+Items will not refresh after purchase
+If Bub's exists in a Biome:
+At least 3 of the Sides will feature that Biome tag (guaranteed)
+One of the Common Trinkets will feature that Biome tag (if possible)
+One of the Food will feature that Biome tag
+6 Sides are chosen as follows:
+Roll first to see if there will be a level 3 side
+Yes	20%
+No	80%
+Then roll to see how many level 2 sides there will be
+	1	2	3	<--(level 2 sides in the shop)
+If 0 level 3 sides	0	65%	35%
+If 1 level 3 side	60%	30%	10%
+Fill the remaining 2-4 slots with level 1 sides
+If in a Biome:
+Select 3 Sides at random to be the Biome tagged ones - pull only Sides from that level pool with that biome tag
+The other 3 Sides are chosen randomly and may feature other Biome tags or even the same Biome tag (true random from that level's pool)
+If player has 2 copies of a Level 3 side on any single die, remove that Die Side from being picked as a Bub's selection
+3 Trinkets are chosen as follows:
+2 Common trinkets, random odds* (Biome exception)
+1 Rare trinket, random odds
+Players can't get the same trinket twice, so only show ones the players don't have
+If not enough of the trinkets exist to display/offer due to the player already having all of them from the pool (very unlikely but possible), leave the slot empty
+If in a Biome, and player does not have all (2) of the Common trinkets from that Biome already, then at least 1 of the 2 Common trinkets offered Bub's must feature that Biome's tag - roll for that one first
+2 Food are chosen as follows:
+First Food	Food Pool 1
+Second Food	60% chance of Pool 1, 40% chance of Pool 2
+Prices for Items:	Min	Avg	Max
+Level 1 Side	45	50	55
+Level 2 Side	68	75	82
+Level 3 Side	150	165	180
+Food Pool 1 (common)	45	50	55
+Food Pool 2 (rare)	100	120	140
+Common Trinket	195	210	225
+Rare Trinket	230	270	310
+Use a gaussian distribution to determine prices when player enters the shop. Only whole numbers
+Then, select 1 Side at random and give it a Sale tag. Cut the price by 35% rounded down.
+Time Crystals:
+Up to 3 Time Crystals can be purchased
+First Crystal	20
+Second Crystal	25
+Third Crystal	30
+Burns:
+The first Burn purchased in a run costs 6 Health (your burns are paid by blood sacrifice)
+Each subsequent Burn purchased in the run costs 3 additional Health (9, 12, 15, etc)
+Only 1 Burn can be purchased at that particular Bub's. You'll have to go to another one to get another Burn.

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+*.egg-info/
+data/full_runs/
+data/full_runs_archive/
+data/*.log
+data/battles/
+data/sessions/
+data/session_*.json
+.venv/
+.claude/scheduled_tasks.lock

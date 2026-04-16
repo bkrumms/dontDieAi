@@ -1,0 +1,83 @@
+	A	B	C	D	E	F	G	H
+		NFTs Sold at avg $3 price point	NFTs sold	Topline
+Example	Price	$3	10,000	$30,000
+	Prize Pool	80%		$24,000
+	Operations	20%		$6,000
+Pool #	Pool Name	% of Total Prize Pool Distributed	$ in Pool	Winner Count
+1	2nd Boss Checkpoint	50.00%	$12,000	50% Leaderboard, 50% Random Draw
+2	2nd Mini Boss Checkpoint	25.00%	$6,000	50% Leaderboard, 50% Random Draw
+3	1st Boss Checkpoint	15.00%	$3,600	50% Leaderboard, 50% Random Draw
+4	1st Mini Boss Checkpoint	10.00%	$2,400	50% Leaderboard, 50% Random Draw
+		100.00%	$24,000
+NFT Tiers
+Standard	Premium	Degen	*not in RtS2 tournaments
+$1	$10	$100
+If you win, this is base what you win, multiplied by Loot Multiple
+Example - a legendary $100 run gets 6x on their loot multiple. They beat the 2nd boss so they're eligible for the 2nd boss pool, which they didn't win the leaderboard, but they won in the random draw. They earn 6x so they get $600
+Each NFT can only win 1 prize
+Continue rolling winners until the % of the prize distribution is reached.
+If the final prize winner that pushes the % over the cap has excess payout, it comes from the next pool
+Leaderboards are paid out first, in order, until 50% of the pool is paid out, then the remaining money in the pool is distributed to remaining NFTs based on random draw where the NFT's score is its odds of winning
+	Common	Rare	Legendary	Mythic
+Sticker Value - Loot Points	1	2	5	11
+Loot Points to reach Loot Multiple
+Loot Multiple	Total Loot Points to needed to reach multiple	Cumulative Loot Points
+1x	5	5
+2x	5	10
+3x	6	16
+4x	6	22
+5x	6	28
+6x	8	36
+7x	8	44
+8x	8	52
+9x	8	60
+10x	8	68
+	Players can bring in up to 3 Stickers with them in a run
+	Players will earn 1 complimentary Sticker at the start of their run, equal to their run's tier ($100 Degen Run = Legendary Sticker)
+	Complete a full Sticker Set in a single run to earn bonus Loot Points (details below)
+	When player gets a random sticker, their odds of pulling the different rarities
+	If a player gets a sticker in a mystery event, it will match the run's NFT tier
+	NFT Tier
+	Standard	Premium	Degen
+Common	60%	38%	35%
+Rare	24%	38%	36%
+Legendary	12%	18%	22%
+Mythic	4%	6%	7%
+SUM	100%	100%	100%
+	Higher priced runs (higher tier) have higher odds of higher rarity stickers to compensate for the concentrated risk taken, since it is riskier to do a higher priced single run rather than 10x lower priced runs
+Available Stickers
+	SET	Hat	Outfit	R Arm	L Arm	Adornment	BONUS Loot Points (complete set!)
+	Gold	Gold Helmet	Gold Armor	Gold Sword	Timeless Stopwatch	Crystal Badge	15
+	Avax	Centurion Helmet	Avax Armor	Ava-Axe	Lucky Dice	Avax Sash	10
+	Toxic	Gas Mask	Toxic Armor	Toxic Trident	Potion of Death	N/A	7
+	Frozen	Frigid Hood	Frozen Armor	Icesickle	Glint's Shield	N/A	7
+	Flaming	Firant Crown	Flaming Armor	Flamace	Molotov Cocktail	N/A	7
+	No Set	Bucket Hat	InVest	Echo Dagger	N/A	Moggers	0
+	No Set (starters)	N/A	Standard Armor	Metal Sword	Metal Shield	N/A	0
+	Rarity	Name	Loot Points	Set?	Slot	Description
+	Common	Avax Armor	1	Avax	Outfit	Battle-tested. Avalanche-approved.
+		Lucky Dice	1	Avax	L Arm	Fortune favors the bold. Skill makes it real.
+		Toxic Armor	1	Toxic	Outfit	Corrosive drip that turns close fights into nightmares.
+		Potion of Death	1	Toxic	L Arm	Drink responsibly. Or don’t — this isn’t that kind of potion.
+		Frozen Armor	1	Frozen	Outfit	Ice in your veins, frost on your plate. Mildly uncomfortable.
+		Frigid Hood	1	Frozen	Hat	Taken from someone colder than you’ll ever be.
+		Flaming Armor	1	Flaming	Outfit	Forged in flame. Tempered by survival.
+		Flamace	1	Flaming	R Arm	A flaming mace for when your dice need a little extra heat.
+		Bucket Hat	1	No Set	Hat	Ideal for fishing. Questionable everywhere else.
+		InVest	1	No Set	Outfit	Keeps your core warm while you assess the downside.
+		Moggers	1	No Set	Adornment	Common item. Legendary energy. You’ll understand eventually.
+	Rare	Gold Helmet	2	Gold	Hat	Too much helmet. Just enough confidence. You can see right?
+		Gold Sword	2	Gold	R Arm	Every swing feels expensive.
+		Timeless Stopwatch	2	Gold	L Arm	Every second counts. Some count twice. Or thrice. Or more.
+		Ava-Axe	2	Avax	R Arm	Cold battle-axe steel that hits like an avalanche.
+		Gas Mask	2	Toxic	Hat	You won’t notice it working. That’s the point.
+		Icesickle	2	Frozen	R Arm	Looks fragile. Just like the baddie's chances against it.
+		Molotov Cocktail	2	Flaming	L Arm	A champagne toast that really goes out with a bang.
+	**cannot be earned randomly - only given when player gets the Echo Dagger in the mystery event	Echo Dagger	2	No Set	R Arm	You are the chosen one... again?
+	Legendary	Gold Armor	5	Gold	Outfit	Protection you can feel. Status you can’t ignore.
+		Centurion Helmet	5	Avax	Hat	Cold, disciplined, and impossible to stop once rolling.
+		Glint's Shield	5	Frozen	L Arm	Fableborne-forged, glinting bright and standing firm.
+		Toxic Trident	5	Toxic	R Arm	Venom-soaked steel chosen by an eye from the deep.
+		Firant Crown	5	Flaming	Hat	Fire-forged royalty, stripped from the Queen herself.
+	Mythic	Crystal Badge	11	Gold	Adornment	Time progresses at your discretion.
+		Avax Sash	11	Avax	Adornment	Probability, under your command.

@@ -1,0 +1,48 @@
+
+## Watch session started 2026-04-13T14:19:29.004604Z — `10792b8f-a38d-4b0a-b93e-38283588f40c`
+
+- `14:19:29` **INIT** — inState=`baddie` HP=59/60 TC=5 gold=76 points=1460 path=`main`[2] chapter=1
+- `14:19:43` **DAMAGE** — 59 -> 55 (-4)
+- `14:19:43` **POINTS** — 1460 -> 2790 (+1330)
+- `14:19:45` **GOLD** — 76 -> 93 (+17)
+- `14:20:20` **DIE** — die#4: +['(e) Attack 4. Heal equal to unblocked Damage']
+- `14:20:21` **STATE** — `baddie` -> `map`
+- `14:21:40` **STATE** — `map` -> `rewindable`
+- `14:21:40` **MOVE** — `main`[2] -> `main`[5]
+- `14:21:47` **STATE** — `rewindable` -> `mystery`
+- `14:21:54` **STATE** — `mystery` -> `map`
+- `14:21:56` **TC** — 5 -> 9 (+4)
+- `14:21:57` **ROLL** — rolled 2
+- `14:22:01` **STATE** — `map` -> `rewindable`
+- `14:22:01` **MOVE** — `main`[5] -> `fork2`[7]
+- `14:22:06` **STATE** — `rewindable` -> `campfire`
+- `14:22:13` **STATE** — `campfire` -> `map`
+- `14:22:13` **MOVE** — `fork2`[7] -> `fork2`[9]
+- `14:22:13` **DIE** — die#1: -['Attack 4']
+- `14:22:17` **STATE** — `map` -> `rewindable`
+- `14:22:17` **MOVE** — `fork2`[9] -> `fork2`[10]
+- `14:22:18` **STATE** — `rewindable` -> `mystery`
+- `14:22:25` **STATE** — `mystery` -> `map`
+- `14:22:25` **DIE** — die#4: 
+- `14:22:29` **STATE** — `map` -> `rewindable`
+- `14:22:29` **MOVE** — `fork2`[10] -> `fork2`[13]
+- `14:22:31` **STATE** — `rewindable` -> `baddie`
+- `14:23:05` **DAMAGE** — 55 -> 21 (-34)
+- `14:23:05` **GOLD** — 93 -> 107 (+14)
+- `14:23:05` **POINTS** — 2790 -> 4540 (+1750)
+- `14:23:14` **DIE** — die#2: +['Poison all 4']
+- `14:23:16` **STATE** — `baddie` -> `map`
+- `14:23:18` **STATE** — `map` -> `rewindable`
+- `14:23:18` **MOVE** — `fork2`[13] -> `fork2`[15]
+- `14:23:19` **STATE** — `rewindable` -> `mystery`
+- `14:23:23` **POINTS** — 4540 -> 1207 (-3333)
+- `14:23:27` **POINTS** — 1207 -> 207 (-1000)
+- `14:23:28` **POINTS** — 207 -> 107 (-100)
+- `14:23:30` **POINTS** — 107 -> 7 (-100)
+- `14:23:32` **STATE** — `mystery` -> `map`
+- `14:23:36` **STATE** — `map` -> `big-baddie`
+- `14:23:36` **MOVE** — `fork2`[15] -> `fork2`[17]
+- `14:23:38` **STATE** — `big-baddie` -> `lost`
+- `14:23:38` **DAMAGE** — 21 -> 0 (-21)
+- `14:23:38` **POINTS** — 7 -> 397 (+390)
+- `14:23:38` **TERMINAL** — state=`lost`

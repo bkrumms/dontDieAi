@@ -1,0 +1,358 @@
+{
+  "fork1Nodes": [
+    {
+      "path": "fork1",
+      "type": "baddie",
+      "biome": "Ice Cave",
+      "index": 8
+    },
+    {
+      "path": "fork1",
+      "type": "mystery",
+      "biome": "Ice Cave",
+      "index": 9
+    },
+    {
+      "path": "fork1",
+      "type": "big-baddie",
+      "biome": "Ice Cave",
+      "index": 10
+    },
+    {
+      "path": "fork1",
+      "type": "big-baddie",
+      "biome": "Ice Cave",
+      "index": 11
+    },
+    {
+      "path": "fork1",
+      "type": "campfire",
+      "biome": "Ice Cave",
+      "index": 12
+    },
+    {
+      "path": "fork1",
+      "type": "campfire",
+      "biome": "Ice Cave",
+      "index": 13
+    },
+    {
+      "path": "fork1",
+      "type": "campfire",
+      "biome": "Ice Cave",
+      "index": 14
+    },
+    {
+      "path": "fork1",
+      "type": "baddie",
+      "biome": "Ice Cave",
+      "index": 15
+    },
+    {
+      "path": "fork1",
+      "type": "mystery",
+      "biome": "Ice Cave",
+      "index": 16
+    },
+    {
+      "path": "fork1",
+      "type": "mystery",
+      "biome": "Ice Cave",
+      "index": 17
+    }
+  ],
+  "fork2Nodes": [
+    {
+      "path": "fork2",
+      "type": "baddie",
+      "biome": "Volcano",
+      "index": 6
+    },
+    {
+      "path": "fork2",
+      "type": "campfire",
+      "biome": "Volcano",
+      "index": 7
+    },
+    {
+      "path": "fork2",
+      "type": "campfire",
+      "biome": "Volcano",
+      "index": 8
+    },
+    {
+      "path": "fork2",
+      "type": "campfire",
+      "biome": "Volcano",
+      "index": 9
+    },
+    {
+      "path": "fork2",
+      "type": "mystery",
+      "biome": "Volcano",
+      "index": 10
+    },
+    {
+      "path": "fork2",
+      "type": "baddie",
+      "biome": "Volcano",
+      "index": 11
+    },
+    {
+      "path": "fork2",
+      "type": "mystery",
+      "biome": "Volcano",
+      "index": 12
+    },
+    {
+      "path": "fork2",
+      "type": "baddie",
+      "biome": "Volcano",
+      "index": 13
+    },
+    {
+      "path": "fork2",
+      "type": "baddie",
+      "biome": "Volcano",
+      "index": 14
+    },
+    {
+      "path": "fork2",
+      "type": "mystery",
+      "biome": "Volcano",
+      "index": 15
+    },
+    {
+      "path": "fork2",
+      "type": "mystery",
+      "biome": "Volcano",
+      "index": 16
+    },
+    {
+      "path": "fork2",
+      "type": "big-baddie",
+      "biome": "Volcano",
+      "index": 17
+    },
+    {
+      "path": "fork2",
+      "type": "big-baddie",
+      "biome": "Volcano",
+      "index": 18
+    },
+    {
+      "path": "fork2",
+      "type": "big-baddie",
+      "biome": "Volcano",
+      "index": 19
+    },
+    {
+      "path": "fork2",
+      "type": "mystery",
+      "biome": "Volcano",
+      "index": 20
+    }
+  ],
+  "mainPathNodes": [
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 0
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 1
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 2
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 3
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 4
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 5
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 6
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 7
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 8
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 9
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 10
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 11
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 12
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 13
+    },
+    {
+      "path": "main",
+      "type": "campfire",
+      "index": 14
+    },
+    {
+      "path": "main",
+      "type": "campfire",
+      "index": 15
+    },
+    {
+      "path": "main",
+      "type": "campfire",
+      "index": 16
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 17
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 18
+    },
+    {
+      "path": "main",
+      "type": "bub",
+      "index": 19
+    },
+    {
+      "path": "main",
+      "type": "bub",
+      "index": 20
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 21
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 22
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 23
+    },
+    {
+      "path": "main",
+      "type": "campfire",
+      "index": 24
+    },
+    {
+      "path": "main",
+      "type": "big-baddie",
+      "index": 25
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 26
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 27
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 28
+    },
+    {
+      "path": "main",
+      "type": "mystery",
+      "index": 29
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 30
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 31
+    },
+    {
+      "path": "main",
+      "type": "obelisk",
+      "index": 32
+    },
+    {
+      "path": "main",
+      "type": "obelisk",
+      "index": 33
+    },
+    {
+      "path": "main",
+      "type": "baddie",
+      "index": 34
+    },
+    {
+      "path": "main",
+      "type": "loot-die",
+      "index": 35
+    },
+    {
+      "path": "main",
+      "type": "campfire",
+      "index": 36
+    },
+    {
+      "path": "main",
+      "type": "bub",
+      "index": 37
+    },
+    {
+      "path": "main",
+      "type": "campfire",
+      "index": 38
+    },
+    {
+      "path": "main",
+      "type": "boss-baddie",
+      "index": 39
+    }
+  ]
+}

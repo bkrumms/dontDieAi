@@ -1,0 +1,102 @@
+	A	B	C	D	E	F	G	H	I	J	K	L	M	N	O	P	Q	R	S	T	U	V	W	X	Y	Z	AA	AB	AC	AD	AE	AF	AG	AH	AI	AJ
+Chapter 1 Baddie Attack Patterns
+					Attack on turn	Attack on turn	Attack on turn								Randomizer?
+Category	Name	Health (equal odds range, +/-2)	Points for Killing	Special Effect	1	2	3	4	5	6	7	8	9	10		Rand Slot 1	Rand Slot 2	Rand Slot 3	Rand Slot 4	% Rand 1	% Rand 2	% Rand 3	% Rand 4	Total
+Baddie	Ice Pufflet	32	100	N/A	Freeze 2	8	rand	(repeat rand)							YES	8, Freeze 2	3 Strength	12		40%	30%	30%		100%
+Baddie	Black Firant	9	100	N/A	6, Bleed 1	10	14, Bleed 2	8 Strength	(repeat 1-4)						NO
+Baddie	Blue Firant	24	100	N/A	6, Block 6	Exhaust 1 Side randomly	rand	(repeat rand)							YES	9, Block 9	Exhaust 1 Side randomly	6 Strength, 3 Armor		55%	15%	30%		100%
+Baddie	Baby Scarebug	22	100	N/A	Poison 1	Poison 1	Poison 2	Poison 3	Poison 4	(repeat 5)					NO
+Baddie	Frostmaul	36	200	Stacks Block forever	Block 20	Block 8	Attack = Block	rand	(repeat 1-4)						YES	12, Freeze 3	12, Block 12			70%	30%			100%
+Baddie	Cobra Frier	36	200	N/A	rand	rand	4 Strength	(repeat 1-3)							YES	8, Bleed 2	14			50%	50%			100%
+Baddie	Kevin	44	200	N/A	Rehealth all 14	16	12, Rehealth all 10	Block 30	(repeat 1-4)						NO
+Baddie	Lil Zomboid	40	200	N/A	rand	Poison 1	8	rand	(repeat 1-4)						NO	Freeze 2, Bleed 2	8			50%	50%			100%
+Baddie	Rock Lobster	38	200	Stacks Block forever	16	Block 20	Block 15	10, Block 10	5 Strength, 5 Armor	(repeat 1-5)					NO
+Big Baddie	Wendibrrr	96	500	Can't be Frozen	Add a random Curse side to random die	Block 20, Freeze 7	16, Block 6	20	Add random Curse	Strength 10	(repeat 3-6)				NO
+Big Baddie	Firant Queen	68	500	N/A	8	12	Rehealth all 12	8	12	Strength 6	(repeat 4-6)				NO
+Big Baddie	Gorgon-zola	80	500	When afflicted with Bleed or Freeze, also afflict Hero	Poison 3	Block 24	18	Poison 3	6 Strength, 6 Armor	Block 24	Poison 3	18	(repeat 5-8)		NO
+Boss Baddie	Ganondwarf	160	1000	N/A	Freeze 4, Bleed 3, Poison 2	14	8, 2 times	12, 2 times	Block 20, 8 Strength	(repeat 2-5)					NO
+Chapter 2 Baddie Attack Patterns
+					Attack on turn	Attack on turn	Attack on turn								Randomizer?
+Category	Name	Health (equal odds range, +/-2)	Points for Killing	Special Effect	1	2	3	4	5	6	7	8	9	10		Rand Slot 1	Rand Slot 2	Rand Slot 3	Rand Slot 4	% Rand 1	% Rand 2	% Rand 3	% Rand 4	Total
+Baddie	Haunt	52	300	Gains 'Negate Damage'	Gain 4 Negate Damage	Add a random Curse side to random die	7, 2 times, gain 2 Strength	rand	(repeat rand)						YES	7, 2 times, gain 2 Strength	Gain 2 Negate Damage	Add a random Curse side to random die		50%	30%	20%		100%
+Baddie	Crystal Zomboid	42	300	Eat (destroy) Time Crystals	rand	rand	rand	Eat 2 Time Crystals	Strength 20	rand	(repeat rand)				YES	4	6	8	Strength 10	25%	40%	25%	10%	100%
+Baddie	Frigid Interloper	56	300	Starts with 20 Block. Stacks Block. Freezes one of your Dice randomly (ice glitch - first attack)	Add modifier to baddie: Ice Glitch - freezes a random die at the start of every turn. That die doesn't roll this turn	18, Freeze 2	Block 20	18, Block 10	Block 10, Freeze 2	20	30	40	50	(repeat 9)	NO
+Baddie	Lavamander	116	300	Melts Block (removes block, makes it 0)	2, 5 times	Melt all player Block	Strength 3	2, 5 times	Melt all player Block	Strength 5	2, 5 times	(repeat 6-7)			NO
+Baddie	Jellire	42	300	N/A	6, Strength 4	(repeat 1)									NO
+Baddie	Batty	22	300	"Heals 6 with every Attack" - will just use a stand-in icon as the modifier but we'll put the heals on the attacks themselves, but won't tell the player - it'll look like the modifier is doing it, without us having to code anything new	(repeat rand)										YES	8, Heal 6	6, Poison 2, Heal 6	6, Bleed 2, Heal 6		40%	30%	30%		100%
+Baddie	Snowfang Pack	72	400	Strength All Snowfang Pack	(repeat rand)										YES	14	4, 2 times	Strength All Snowfang Pack 2	Strength All Snowfang Pack 3	30%	35%	25%	10%	100%
+Baddie	Jellame	164	400	Summoner, Exhaust random Side	16	Exhaust random Side	20	Summon - (Fill all empty baddie slots in front of Jellame with Jellires)	Exhaust random Side	30	Exhaust random Side	Summon - (Fill all empty baddie slots in front of Jellame with Jellires)	60	(repeat 9)	NO
+Baddie	Noxious Interloper	88	400	Cures Poison (toxic glitch - first attack)	Add modifier to baddie: Toxic Glitch - cure all poison at the end of every turn	Block 18, Poison 6	14, Block 12	10, Poison 3	(repeat 3-4)						NO
+Big Baddie	Pterrordactyl	280	800	Starts with 3 Negate Debuffs (ice rice). Gains Negate Debuffs. Removes Debuffs. Steals Armor	24	Block 40	Steal all player armor	30, Block 5 times the current turn	Remove all debuffs. Add 3 Negate Debuffs (apply ice rice)	30, Block 10	Steal all player armor	24, Block 5 times the current turn	40, Block 10	(repeat 7-9)	NO
+Big Baddie	Detonox	240	800	Any time lose hp, gain 3 Strength (rage shake), Explodes after 7 turns (dies)	Bleed 3	Bleed 2	Bleed 1	12	12, Bleed 3	1, 3 times	100 - Explode, self-destruct and end battle				NO
+Big Baddie	Deathbat	144	800	Summoner, says phrases (like bub does)	Summon + say phrase - (Fill all empty baddie slots in front of Deathbat with Battys) - phrase here is always "This is bat country"	6	Strength 6	Summon	6	34, Heal 70, say phrase - phrase is random, see column AB	Summon	Strength 10	6	(repeat 8-9)	NO
+Boss Baddie	Big Cheeze	See Below		You only need to fight/defeat one of the below. Big Cheeze changes attack sequence based on the Level 3 biomes of the player's starting dice. This occurs on his first attack, which adds a modifier called cheezy glitch. If you have Volcano sides, it chooses Shield. If you have Ice sides, it chooses Poison. If you have Toxic sides, it chooses Attack. If 2 are tied for majority, see Type1/Type2 combos, if all level 3 biome tag sides are equal, Big Cheeze will do - mix. Level 3 sides without a biome tag are not considered. This decision is solely about biome-tagged level 3 sides
+red	BC - Attack (level 3 toxic majority on player's dice)	700	2000	Attack Mode	Add modifier to boss: (cheezy glitch - change form to counter you). Molds itself into your starting dice's biome weakness	20, 2 times	30, Block 10	40, Block 10	Melt all Block. Remove all Debuffs	Gain 6 Negate Debuffs	rand	(repeat 7)			YES	25, 2 times	50, Block 10	Strength 10, Armor 10		35%	50%	15%		100%
+light blue	BC - Shield (volcano)	700	2000	Shield Mode	Add modifier to boss: (cheezy glitch - change form to counter you). Molds itself into your starting dice's biome weakness	Armor 15, gain 5 Block at the end of every turn	Block 20, Poison 7	40, Armor 10	Melt all Block. Remove all Debuffs	Exhaust 1 side on every Die, set Damage Multiplier to 1x	rand	(repeat 7)			YES	Block 15, Poison 7	12, 4 times	Exhaust one Side on a random die		35%	35%	30%		100%
+green	BC - Poison (ice cave)	700	2000	Poison Mode	Add modifier to boss: (cheezy glitch - change form to counter you). Molds itself into your starting dice's biome weakness	Poison 1, 5 times	Poison 5	Block 25, Poison 3	Melt all Block. Remove all Debuffs	Exhaust any side that contains 'block'	rand	(repeat 7)			YES	Poison 6	Block 20, Poison 3	30		45%	35%	20%		100%
+purple	BC - Attack/Shield (toxic/volcano)	700	2000	Melee Mode	Add modifier to boss: (cheezy glitch - change form to counter you). Molds itself into your starting dice's biome weakness	20, Block 20	Strength 5, Armor 5	18, 2 times, Block 24	Melt all Block. Remove all Debuffs	Add 2 Exhaustion Curses to random dice	rand	(repeat 7)			YES	40, Block 30	24, Poison 5	Block 50, Remove Debuffs		35%	45%	20%		100%
+turquoise	BC - Shield/Poison (volcano, ice)	700	2000	Outlast Mode	Add modifier to boss: (cheezy glitch - change form to counter you). Molds itself into your starting dice's biome weakness	Poison 5	gain 4 Armor at the end of every turn, gain 4 Block at the end of every turn	Freeze 5, Poison 5	Melt all Block. Remove all Debuffs	Add 2 Poison Curses to random dice	rand	(repeat 7)			YES	Poison 2, 4 times	Block 30, Stack block 3 turns	Exhaust 2 Sides on random dice		50%	35%	15%		100%
+orange	BC - Poison/Attack (ice, toxic)	700	2000	Onslaught Mode	Add modifier to boss: (cheezy glitch - change form to counter you). Molds itself into your starting dice's biome weakness	20, Poison 5, Bleed 2	12, 3 times	Poison 3, Strength 3	Melt all Block. Remove all Debuffs	Add 2 Bleed Curses to random dice	rand	(repeat 7)			YES	8, 4 times	Poison 5, Strength 5	Block 50, Remove Debuffs		40%	40%	20%		100%
+white	BC - Mix	700	2000	Balanced Mode	Add modifier to boss: (cheezy glitch - change form to counter you). Molds itself into your starting dice's biome weakness	20, Block 20, Poison 5	35, Block 10, Freeze 3	7, 4 times	Melt all Block. Remove all Debuffs	Add Duplicator Curse to random die	rand	(repeat 7)			YES	Poison 2, 4 times	Block 50, Remove Debuffs	40		30%	30%	40%		100%
+Boss Baddie	Zomboid Horde	See Below
+Baddie	Lil Zomboid	40	200	N/A	rand	Poison 1	8	rand	(repeat 1-4)						YES	Freeze 2, Bleed 2	8			50%	50%			100%
+Baddie	Crystal Zomboid	42	300	Eat (destroy) Time Crystals	rand	rand	rand	Eat 2 Time Crystals	Strength 20	rand	(repeat rand)				YES	4	6	8	Strength 10
+Baddie	Infernal Zomboid	116	600	Gains 4 Strength at turn end. Every turn this baddie is alive, a random Side is Exhausted	6, 2 times	14	(repeat 1-2)								NO
+Baddie	Necrotic Zomboid	154	600	Heals 8 at turn end	Poison 2, 2 times	Poison 2	6, Block 6	Heal all 12	Bleed 3, Poison 2	rand	(repeat 6)				YES	10, Poison 2	Heal all 12	Poison 6		20%	30%	50%		100%
+Baddie	Cryonic Zomboid	190	600	Gain 4 Armor at turn end	Gain 4 Block at end of every turn	12, Block 12	Block 12, Gain 6 Strength at turn end	Block 12, Freeze 5	6	2, 2 times	rand	(repeat 7)			YES	6, Block 4	Strength 18	2, 2 times		50%	25%	25%		100%
+CHAPTER 1 BATTLE LIST								CHAPTER 2 BATTLE LIST
+B Fights 1	Spaces 1-5							B Fights 1	Spaces 1-5
+	Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5				Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5
+Neutral	Black Firant	Black Firant						Neutral	Haunt	Haunt
+Neutral	Ice Pufflet							Neutral	Batty	Frigid Interloper
+Neutral	Baby Scarebug							Neutral	Crystal Zomboid	Crystal Zomboid	Crystal Zomboid
+B Fights 2	Spaces 6-13							B Fights 2	Spaces 6-13
+	Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5				Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5
+Ice Cave	Ice Pufflet	Ice Pufflet						Ice Cave	Ice Pufflet	Frostmaul	Frigid Interloper
+Ice Cave	Frostmaul							Ice Cave	Crystal Zomboid	Frostmaul	Ice Pufflet
+Volcano	Black Firant	Cobra Frier						Volcano	Jellire	Black Firant	Jellire	Black Firant
+Volcano	Cobra Frier	Random Firant						Volcano	Blue Firant	Lavamander
+Toxic Swamp	Baby Scarebug	Lil Zomboid						Toxic Swamp	Noxious Interloper
+Toxic Swamp	Kevin							Toxic Swamp	Batty	Baby Scarebug	Kevin	Batty
+B Fights 3	Spaces 14-23							B Fights 3	Spaces 14-23
+	Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5				Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5
+Ice Cave	Frostmaul	Ice Pufflet						Ice Cave	Snowfang Pack	Snowfang Pack	Frostmaul
+Ice Cave	Ice Pufflet	Rock Lobster						Ice Cave	Haunt	Frigid Interloper
+Volcano	Black Firant	Random Firant	Random Firant					Volcano	Jellire	Jellire	Jellame
+Volcano	Blue Firant	Blue Firant	Blue Firant					Volcano	Jellire	Jellame	Haunt
+Toxic Swamp	Baby Scarebug	Baby Scarebug						Toxic Swamp	Batty	Batty	Batty	Batty
+Toxic Swamp	Lil Zomboid	Kevin						Toxic Swamp	Baby Scarebug	Baby Scarebug	Baby Scarebug	Kevin
+Neutral	Rock Lobster	Black Firant						Neutral	Lavamander	Crystal Zomboid	Ice Pufflet
+Neutral	Lil Zomboid	Lil Zomboid						Neutral	Haunt	Crystal Zomboid	Batty
+B Fights 4	Spaces 24-39							B Fights 4	Spaces 24-39
+	Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5				Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5
+Ice Cave	Frostmaul	Frostmaul	Lil Zomboid					Ice Cave	Snowfang Pack	Snowfang Pack	Snowfang Pack
+Ice Cave	Frostmaul	Rock Lobster						Ice Cave	Snowfang Pack	Snowfang Pack	Frigid Interloper
+Volcano	Cobra Frier	Blue Firant						Volcano	Black Firant	Lavamander	Jellire	Jellire
+Volcano	Black Firant	Blue Firant	Cobra Frier					Volcano	Lavamander	Blue Firant	Cobra Frier
+Toxic Swamp	Kevin	Baby Scarebug						Toxic Swamp	Batty	Batty	Noxious Interloper	Baby Scarebug
+Toxic Swamp	Baby Scarebug	Baby Scarebug	Baby Scarebug					Toxic Swamp	Noxious Interloper	Kevin	Kevin
+BB Fights Chapter 1								BB Fights Chapter 2
+	Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5				Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5
+Ice Cave	Wendibrrr							Ice Cave	Pterrordactyl
+Volcano	Black Firant	Black Firant	Firant Queen	Blue Firant				Volcano	Detonox
+Toxic Swamp	Gorgon-zola							Toxic Swamp	(empty)	(empty)	Deathbat
+Obelisk Fights Chapter 1								Obelisk Fights Chapter 2
+	FIGHT 1								FIGHT 1						FIGHT 2
+	Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5				Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5		Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5
+Ice Cave	Frostmaul	Frostmaul	Ice Pufflet					Ice Cave	Snowfang Pack	Snowfang Pack	Snowfang Pack				Pterrordactyl	Ice Pufflet	Ice Pufflet
+Volcano	Cobra Frier	Cobra Frier						Volcano	Lavamander	Blue Firant	Black Firant	Lavamander			Black Firant	Cobra Frier	Detonox
+Toxic Swamp	Baby Scarebug	Baby Scarebug	Baby Scarebug					Toxic Swamp	Noxious Interloper	Haunt	Baby Scarebug				(empty)	(empty)	(empty)	Deathbat
+Boss Fights Chapter 1								Boss Fights Chapter 2
+	Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5				Baddie 1	Baddie 2	Baddie 3	Baddie 4	Baddie 5
+Neutral	Ganondwarf							Neutral	Big Cheeze
+								Neutral	Lil Zomboid	Crystal Zomboid	Infernal Zomboid	Necrotic Zomboid	Cryonic Zomboid
+Battle Picker Instructions
+First, look at space number and space type (baddie vs big, etc)
+Then, look if in biome
+If not in biome, select from Neutrals in the set, and if no neutrals exist, select from any of the fight options in the space set (including any biomes)
+If in biome, select first from the biome fights in that space set
+If in biome and no more baddie fights from that biome exist in that space set, pull from Neutral fights in that space set. If no more Neutrals exist, reset battle options for that set and pick again
+If in biome and it's a big baddie fight, always do the big baddie fight from that biome
+If no more fights are available in the space set across all biomes, reset space set and repeat sequence
+Whenever a fight is selected, remove it from the available remaining fights (players won't repeat a fight unless the bullet immediately above is triggered)

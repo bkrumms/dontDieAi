@@ -1,0 +1,334 @@
+
+## Watch session started 2026-04-14T22:20:37.754759Z — `fb2d740e-2e3e-4e12-9825-b93029c47fa4`
+
+- `22:20:38` **INIT** — inState=`baddie` HP=60/60 TC=5 gold=60 points=0 path=`main`[0] chapter=1
+- `22:21:05` **DAMAGE** — 60 -> 57 (-3)
+- `22:21:05` **POINTS** — 0 -> 1290 (+1290)
+- `22:21:07` **GOLD** — 60 -> 74 (+14)
+- `22:21:07` **FOOD+** — Toxipop
+- `22:21:14` **STATE** — `baddie` -> `map`
+- `22:21:14` **DIE** — die#1: +[' Block 24 if you have no block']
+- `22:21:16` **STATE** — `map` -> `rewindable`
+- `22:21:16` **MOVE** — `main`[0] -> `main`[2]
+- `22:21:18` **STATE** — `rewindable` -> `baddie`
+- `22:21:36` **POINTS** — 1290 -> 2590 (+1300)
+- `22:21:39` **TC** — 5 -> 6 (+1)
+- `22:21:39` **GOLD** — 74 -> 90 (+16)
+- `22:21:47` **DIE** — die#4: +['Attack 16, Bleed 2, Freeze 2']
+- `22:21:50` **STATE** — `baddie` -> `map`
+- `22:21:52` **DIE** — die#2: +['Block 6', 'Block 6', 'Block 6', '(e) Block 10, Freeze All 3', 'Attack 16, Bleed 2, Freeze 2'] -['Attack 4', 'Attack 4', 'Attack All 4', 'Attack 6 Bleed 2']
+- `22:21:52` **DIE** — die#3: +['Attack All 4', 'Attack 6 Bleed 2'] -['Block 6', 'Block 6']
+- `22:21:52` **DIE** — die#4: +['Attack 4', 'Attack 4'] -['(e) Block 10, Freeze All 3', 'Attack 16, Bleed 2, Freeze 2']
+- `22:21:56` **STATE** — `map` -> `rewindable`
+- `22:21:56` **MOVE** — `main`[2] -> `main`[6]
+- `22:21:59` **TC** — 6 -> 4 (-2)
+- `22:21:59` **MOVE** — `main`[6] -> `main`[4]
+- `22:22:01` **STATE** — `rewindable` -> `mystery`
+- `22:22:10` **STATE** — `mystery` -> `map`
+- `22:22:10` **DAMAGE** — 57 -> 49 (-8)
+- `22:22:10` **MAX-HP** — 60 -> 56 (-4)
+- `22:22:10` **DIE** — die#1: -['Attack 4']
+- `22:22:12` **STATE** — `map` -> `rewindable`
+- `22:22:12` **MOVE** — `main`[4] -> `main`[6]
+- `22:22:14` **STATE** — `rewindable` -> `mystery`
+- `22:22:23` **STATE** — `mystery` -> `map`
+- `22:22:25` **MOVE** — `main`[6] -> `main`[7]
+- `22:22:25` **ROLL** — rolled 1
+- `22:22:32` **STATE** — `map` -> `big-baddie`
+- `22:22:32` **MOVE** — `main`[7] -> `main`[8]
+- `22:23:10` **DAMAGE** — 49 -> 28 (-21)
+- `22:23:10` **POINTS** — 2590 -> 4530 (+1940)
+- `22:23:12` **TC** — 4 -> 5 (+1)
+- `22:23:12` **GOLD** — 90 -> 131 (+41)
+- `22:23:12` **FOOD+** — Scorch Sauce
+- `22:23:12` **LOOT-PTS** — 0 -> 1
+- `22:23:24` **STATE** — `big-baddie` -> `map`
+- `22:23:24` **DIE** — die#4: +['(p) Heal 8 at the end of the battle']
+- `22:23:26` **STATE** — `map` -> `rewindable`
+- `22:23:26` **MOVE** — `main`[8] -> `main`[9]
+- `22:23:28` **STATE** — `rewindable` -> `mystery`
+- `22:23:33` **STATE** — `mystery` -> `map`
+- `22:23:33` **HEAL** — 28 -> 36 (+8)
+- `22:23:33` **MAX-HP** — 56 -> 64 (+8)
+- `22:23:35` **STATE** — `map` -> `rewindable`
+- `22:23:35` **MOVE** — `main`[9] -> `main`[12]
+- `22:23:39` **STATE** — `rewindable` -> `loot-die`
+- `22:23:42` **STATE** — `loot-die` -> `map`
+- `22:23:42` **GOLD** — 131 -> 171 (+40)
+- `22:23:42` **MOVE** — `main`[12] -> `main`[13]
+- `22:23:42` **TRINKET+** — Lizard Mask
+- `22:23:42` **LOOT-PTS** — 1 -> 2
+- `22:23:44` **MOVE** — `main`[13] -> `main`[14]
+- `22:23:44` **ROLL** — rolled 1
+- `22:23:46` **STATE** — `map` -> `rewindable`
+- `22:23:46` **MOVE** — `main`[14] -> `fork2`[15]
+- `22:23:53` **STATE** — `rewindable` -> `bub`
+- `22:24:06` **DAMAGE** — 36 -> 30 (-6)
+- `22:24:06` **GOLD** — 171 -> 48 (-123)
+- `22:24:11` **DIE** — die#2: +['Multiple Largest Attack On This Die']
+- `22:24:13` **DIE** — die#3: +['Attack 28']
+- `22:24:15` **DIE** — die#2: 
+- `22:24:20` **STATE** — `bub` -> `map`
+- `22:24:20` **MOVE** — `fork2`[15] -> `fork2`[16]
+- `22:25:29` **STATE** — `map` -> `rewindable`
+- `22:25:29` **MOVE** — `fork2`[16] -> `fork2`[18]
+- `22:25:38` **STATE** — `rewindable` -> `campfire`
+- `22:25:49` **STATE** — `campfire` -> `map`
+- `22:25:49` **MOVE** — `fork2`[18] -> `fork2`[19]
+- `22:25:49` **DIE** — die#3: 
+- `22:25:54` **STATE** — `map` -> `rewindable`
+- `22:25:54` **MOVE** — `fork2`[19] -> `fork2`[22]
+- `22:25:58` **STATE** — `rewindable` -> `map`
+- `22:25:58` **TC** — 5 -> 3 (-2)
+- `22:25:58` **MOVE** — `fork2`[22] -> `fork2`[19]
+- `22:26:01` **STATE** — `map` -> `rewindable`
+- `22:26:01` **MOVE** — `fork2`[19] -> `fork2`[23]
+- `22:26:03` **TC** — 3 -> 1 (-2)
+- `22:26:03` **MOVE** — `fork2`[23] -> `fork2`[21]
+- `22:26:03` **REROLL-COST** — 2 -> 3
+- `22:26:05` **STATE** — `rewindable` -> `mystery`
+- `22:26:05` **REROLL-COST** — 3 -> 2
+- `22:26:16` **STATE** — `mystery` -> `map`
+- `22:26:16` **HEAL** — 30 -> 35 (+5)
+- `22:26:16` **DIE** — die#4: 
+- `22:26:21` **STATE** — `map` -> `mystery`
+- `22:26:21` **MOVE** — `fork2`[21] -> `fork2`[23]
+- `22:26:25` **STATE** — `mystery` -> `map`
+- `22:26:25` **TRINKET+** — Sunstone
+- `22:26:25` **TRINKET-** — Lizard Mask
+- `22:26:27` **STATE** — `map` -> `rewindable`
+- `22:26:27` **MOVE** — `fork2`[23] -> `main`[24]
+- `22:26:34` **STATE** — `rewindable` -> `campfire`
+- `22:26:39` **STATE** — `campfire` -> `map`
+- `22:26:39` **DIE** — die#2: 
+- `22:26:43` **STATE** — `map` -> `big-baddie`
+- `22:26:43` **MOVE** — `main`[24] -> `main`[25]
+- `22:27:04` **FOOD-** — Scorch Sauce
+- `22:27:26` **HEAL** — 35 -> 43 (+8)
+- `22:27:26` **POINTS** — 4530 -> 6820 (+2290)
+- `22:27:28` **TC** — 1 -> 3 (+2)
+- `22:27:28` **GOLD** — 48 -> 114 (+66)
+- `22:27:28` **TRINKET+** — Pet Hooligan Mask
+- `22:27:28` **FOOD+** — Snackrifice
+- `22:27:28` **LOOT-PTS** — 2 -> 4
+- `22:27:44` **STATE** — `big-baddie` -> `map`
+- `22:27:44` **CHECKPOINT** — pending 0 -> 1
+- `22:27:44` **DIE** — die#4: +['Attack 16, Bleed 2, Freeze 2']
+- `22:59:03` **STATE** — `map` -> `rewindable`
+- `22:59:03` **MOVE** — `main`[25] -> `main`[28]
+- `22:59:03` **CHECKPOINT** — pending 1 -> None
+- `22:59:07` **STATE** — `rewindable` -> `mystery`
+- `22:59:30` **STATE** — `mystery` -> `map`
+- `22:59:30` **DIE** — die#3: +['Echo Dagger'] -['Attack 4']
+- `22:59:30` **LOOT-MUL** — 0 -> 1
+- `22:59:30` **LOOT-PTS** — 4 -> 6
+- `22:59:32` **STATE** — `map` -> `rewindable`
+- `22:59:32` **MOVE** — `main`[28] -> `main`[30]
+- `22:59:34` **STATE** — `rewindable` -> `baddie`
+- `22:59:43` **FOOD-** — Snackrifice
+- `23:00:11` **HEAL** — 43 -> 51 (+8)
+- `23:00:11` **POINTS** — 6820 -> 9250 (+2430)
+- `23:00:13` **GOLD** — 114 -> 129 (+15)
+- `23:00:25` **DIE** — die#1: +['Block 8, Gain 1 Armor']
+- `23:00:27` **STATE** — `baddie` -> `rewindable`
+- `23:00:27` **MOVE** — `main`[30] -> `main`[32]
+- `23:00:29` **STATE** — `rewindable` -> `obelisk`
+- `23:00:36` **FOOD-** — Toxipop
+- `23:01:10` **DAMAGE** — 51 -> 45 (-6)
+- `23:01:10` **POINTS** — 9250 -> 14250 (+5000)
+- `23:01:12` **TC** — 3 -> 5 (+2)
+- `23:01:12` **GOLD** — 129 -> 204 (+75)
+- `23:01:12` **TRINKET+** — Ket Mask
+- `23:01:12` **LOOT-PTS** — 6 -> 9
+- `23:01:21` **STATE** — `obelisk` -> `map`
+- `23:01:21` **MOVE** — `main`[32] -> `main`[33]
+- `23:01:21` **DIE** — die#4: +['Block 8, Gain 1 Armor']
+- `23:01:23` **STATE** — `map` -> `rewindable`
+- `23:01:23` **MOVE** — `main`[33] -> `main`[36]
+- `23:01:28` **STATE** — `rewindable` -> `campfire`
+- `23:01:34` **STATE** — `campfire` -> `map`
+- `23:01:34` **DIE** — die#1: -['Poison 3']
+- `23:01:37` **STATE** — `map` -> `rewindable`
+- `23:01:37` **MOVE** — `main`[36] -> `main`[38]
+- `23:01:39` **STATE** — `rewindable` -> `campfire`
+- `23:01:46` **STATE** — `campfire` -> `map`
+- `23:01:46` **DIE** — die#4: -['Attack 4']
+- `23:01:50` **STATE** — `map` -> `boss-baddie`
+- `23:01:50` **MOVE** — `main`[38] -> `main`[39]
+- `23:02:15` **HEAL** — 45 -> 74 (+29)
+- `23:02:15` **MAX-HP** — 64 -> 74 (+10)
+- `23:02:15` **TC** — 5 -> 7 (+2)
+- `23:02:15` **GOLD** — 204 -> 298 (+94)
+- `23:02:15` **POINTS** — 14250 -> 17840 (+3590)
+- `23:02:15` **FOOD+** — Toxipop
+- `23:02:15` **LOOT-MUL** — 1 -> 2
+- `23:02:15` **LOOT-PTS** — 9 -> 10
+- `23:02:17` **TRINKET+** — Quadforce
+- `23:02:46` **STATE** — `boss-baddie` -> `map`
+- `23:02:46` **MOVE** — `main`[39] -> `main`[0]
+- `23:02:46` **ROLL** — rolled 0
+- `23:02:46` **CHECKPOINT** — pending None -> 1
+- `23:02:46` **CHAPTER** — 1 -> 2
+- `23:02:46` **DIE** — die#2: +['Negate Damage 2 times']
+- `23:02:49` **STATE** — `map` -> `rewindable`
+- `23:02:49` **MOVE** — `main`[0] -> `main`[1]
+- `23:02:49` **CHECKPOINT** — pending 1 -> None
+- `23:02:51` **STATE** — `rewindable` -> `baddie`
+- `23:03:05` **POINTS** — 17840 -> 21840 (+4000)
+- `23:03:07` **GOLD** — 298 -> 315 (+17)
+- `23:03:18` **STATE** — `baddie` -> `rewindable`
+- `23:03:18` **MOVE** — `main`[1] -> `main`[5]
+- `23:03:20` **STATE** — `rewindable` -> `map`
+- `23:03:20` **TC** — 7 -> 5 (-2)
+- `23:03:20` **MOVE** — `main`[5] -> `main`[1]
+- `23:03:23` **STATE** — `map` -> `rewindable`
+- `23:03:23` **MOVE** — `main`[1] -> `main`[3]
+- `23:03:25` **STATE** — `rewindable` -> `mystery`
+- `23:03:32` **STATE** — `mystery` -> `map`
+- `23:03:32` **DIE** — die#4: 
+- `23:03:36` **MOVE** — `main`[3] -> `main`[5]
+- `23:03:36` **ROLL** — rolled 2
+- `23:03:38` **STATE** — `map` -> `rewindable`
+- `23:03:38` **MOVE** — `main`[5] -> `fork1`[7]
+- `23:03:43` **STATE** — `rewindable` -> `map`
+- `23:03:43` **TC** — 5 -> 3 (-2)
+- `23:03:43` **MOVE** — `fork1`[7] -> `main`[3]
+- `23:03:45` **MOVE** — `main`[3] -> `main`[5]
+- `23:03:45` **ROLL** — rolled 1
+- `23:03:47` **STATE** — `map` -> `rewindable`
+- `23:03:47` **MOVE** — `main`[5] -> `fork1`[6]
+- `23:03:52` **STATE** — `rewindable` -> `baddie`
+- `23:04:08` **DAMAGE** — 74 -> 72 (-2)
+- `23:04:08` **GOLD** — 315 -> 333 (+18)
+- `23:04:08` **POINTS** — 21840 -> 26130 (+4290)
+- `23:04:17` **STATE** — `baddie` -> `map`
+- `23:04:17` **DIE** — die#4: +['Attack 16, Duplicate this Side onto this Die']
+- `23:04:19` **STATE** — `map` -> `mystery`
+- `23:04:19` **MOVE** — `fork1`[6] -> `fork1`[7]
+- `23:04:23` **STATE** — `mystery` -> `map`
+- `23:04:23` **POINTS** — 26130 -> 25130 (-1000)
+- `23:04:26` **STATE** — `map` -> `rewindable`
+- `23:04:26` **MOVE** — `fork1`[7] -> `fork1`[9]
+- `23:04:28` **STATE** — `rewindable` -> `campfire`
+- `23:04:32` **STATE** — `campfire` -> `map`
+- `23:04:32` **MOVE** — `fork1`[9] -> `fork1`[10]
+- `23:04:32` **DIE** — die#4: -['Block 6']
+- `23:04:37` **STATE** — `map` -> `loot-die`
+- `23:04:37` **MOVE** — `fork1`[10] -> `fork1`[12]
+- `23:04:39` **STATE** — `loot-die` -> `map`
+- `23:04:39` **GOLD** — 333 -> 357 (+24)
+- `23:04:39` **TRINKET+** — Lizard Mask
+- `23:04:39` **LOOT-PTS** — 10 -> 15
+- `23:04:44` **STATE** — `map` -> `rewindable`
+- `23:04:44` **MOVE** — `fork1`[12] -> `fork1`[15]
+- `23:04:46` **TC** — 3 -> 1 (-2)
+- `23:04:46` **MOVE** — `fork1`[15] -> `fork1`[13]
+- `23:04:48` **STATE** — `rewindable` -> `baddie`
+- `23:04:53` **FOOD-** — Toxipop
+- `23:05:15` **HEAL** — 72 -> 74 (+2)
+- `23:05:15` **GOLD** — 357 -> 371 (+14)
+- `23:05:15` **POINTS** — 25130 -> 29030 (+3900)
+- `23:05:24` **STATE** — `baddie` -> `map`
+- `23:05:24` **DIE** — die#3: +['Attack 12, Freeze 3']
+- `23:05:26` **STATE** — `map` -> `baddie`
+- `23:05:26` **MOVE** — `fork1`[13] -> `fork1`[14]
+- `23:06:18` **DAMAGE** — 74 -> 63 (-11)
+- `23:06:18` **POINTS** — 29030 -> 33830 (+4800)
+- `23:06:20` **TC** — 1 -> 2 (+1)
+- `23:06:20` **GOLD** — 371 -> 387 (+16)
+- `23:06:20` **FOOD+** — Scorch Sauce
+- `23:06:34` **STATE** — `baddie` -> `rewindable`
+- `23:06:34` **MOVE** — `fork1`[14] -> `fork1`[17]
+- `23:06:36` **STATE** — `rewindable` -> `map`
+- `23:06:36` **MOVE** — `fork1`[17] -> `fork1`[14]
+- `23:06:38` **STATE** — `map` -> `rewindable`
+- `23:06:38` **TC** — 2 -> 0 (-2)
+- `23:06:38` **MOVE** — `fork1`[14] -> `fork1`[16]
+- `23:06:40` **STATE** — `rewindable` -> `mystery`
+- `23:06:47` **STATE** — `mystery` -> `map`
+- `23:06:47` **DAMAGE** — 63 -> 55 (-8)
+- `23:06:47` **MAX-HP** — 74 -> 70 (-4)
+- `23:06:47` **DIE** — die#2: -['Block 6']
+- `23:06:52` **STATE** — `map` -> `rewindable`
+- `23:06:52` **MOVE** — `fork1`[16] -> `main`[19]
+- `23:06:56` **STATE** — `rewindable` -> `mystery`
+- `23:07:01` **STATE** — `mystery` -> `map`
+- `23:07:01` **POINTS** — 33830 -> 40497 (+6667)
+- `23:07:03` **STATE** — `map` -> `rewindable`
+- `23:07:03` **MOVE** — `main`[19] -> `main`[23]
+- `23:07:07` **STATE** — `rewindable` -> `mystery`
+- `23:07:10` **STATE** — `mystery` -> `map`
+- `23:07:12` **STATE** — `map` -> `rewindable`
+- `23:07:12` **MOVE** — `main`[23] -> `main`[24]
+- `23:07:14` **STATE** — `rewindable` -> `campfire`
+- `23:07:21` **FOOD+** — Godmode Guac, Ice Rice
+- `23:07:23` **STATE** — `campfire` -> `rewindable`
+- `23:07:23` **MOVE** — `main`[24] -> `main`[25]
+- `23:07:25` **STATE** — `rewindable` -> `big-baddie`
+- `23:07:30` **FOOD-** — Ice Rice
+- `23:07:48` **HEAL** — 55 -> 63 (+8)
+- `23:07:48` **POINTS** — 40497 -> 46177 (+5680)
+- `23:07:50` **TC** — 0 -> 2 (+2)
+- `23:07:50` **GOLD** — 387 -> 454 (+67)
+- `23:07:50` **TRINKET+** — Kronicles Mask
+- `23:07:50` **LOOT-MUL** — 2 -> 3
+- `23:07:50` **LOOT-PTS** — 15 -> 16
+- `23:08:01` **STATE** — `big-baddie` -> `map`
+- `23:08:01` **CHECKPOINT** — pending None -> 1
+- `23:08:01` **DIE** — die#2: +['(e) Decrease all Baddie Strength by 15 this turn']
+- `23:08:04` **CHECKPOINT** — pending 1 -> None
+- `23:08:06` **STATE** — `map` -> `rewindable`
+- `23:08:06` **MOVE** — `main`[25] -> `main`[29]
+- `23:08:08` **STATE** — `rewindable` -> `baddie`
+- `23:08:17` **FOOD-** — Godmode Guac
+- `23:08:28` **DAMAGE** — 63 -> 57 (-6)
+- `23:08:28` **POINTS** — 46177 -> 50697 (+4520)
+- `23:08:30` **GOLD** — 454 -> 468 (+14)
+- `23:08:44` **STATE** — `baddie` -> `map`
+- `23:08:44` **DIE** — die#4: +['Block 8 per Freeze or Bleed on you. Otherwise, Block 10']
+- `23:08:46` **STATE** — `map` -> `rewindable`
+- `23:08:46` **MOVE** — `main`[29] -> `main`[31]
+- `23:08:49` **STATE** — `rewindable` -> `mystery`
+- `23:08:55` **STATE** — `mystery` -> `rewindable`
+- `23:08:55` **HEAL** — 57 -> 70 (+13)
+- `23:08:55` **GOLD** — 468 -> 318 (-150)
+- `23:08:55` **MOVE** — `main`[31] -> `main`[33]
+- `23:08:58` **STATE** — `rewindable` -> `obelisk`
+- `23:10:21` **POINTS** — 50697 -> 61177 (+10480)
+- `23:10:23` **TC** — 2 -> 4 (+2)
+- `23:10:23` **GOLD** — 318 -> 393 (+75)
+- `23:10:23` **TRINKET+** — Snake Skull
+- `23:10:23` **FOOD+** — Clutch Creme
+- `23:10:23` **LOOT-PTS** — 16 -> 18
+- `23:10:32` **DIE** — die#3: +['(e) Give all values on this die +3']
+- `23:10:34` **STATE** — `obelisk` -> `rewindable`
+- `23:10:34` **MOVE** — `main`[33] -> `main`[35]
+- `23:10:39` **TC** — 4 -> 2 (-2)
+- `23:10:39` **MOVE** — `main`[35] -> `main`[36]
+- `23:10:41` **STATE** — `rewindable` -> `campfire`
+- `23:10:48` **STATE** — `campfire` -> `map`
+- `23:10:48` **DIE** — die#3: -['Attack All 4']
+- `23:10:50` **STATE** — `map` -> `rewindable`
+- `23:10:50` **MOVE** — `main`[36] -> `main`[38]
+- `23:10:52` **STATE** — `rewindable` -> `campfire`
+- `23:10:57` **FOOD+** — Toxipop
+- `23:11:04` **STATE** — `campfire` -> `map`
+- `23:11:04` **FOOD+** — Pickle
+- `23:11:04` **FOOD-** — Scorch Sauce
+- `23:11:06` **STATE** — `map` -> `rewindable`
+- `23:11:06` **MOVE** — `main`[38] -> `main`[39]
+- `23:11:08` **STATE** — `rewindable` -> `boss-baddie`
+- `23:11:12` **FOOD-** — Toxipop
+- `23:11:14` **FOOD-** — Pickle, Clutch Creme
+- `23:11:53` **POINTS** — 61177 -> 69217 (+8040)
+- `23:12:04` **HEAL** — 70 -> 80 (+10)
+- `23:12:04` **MAX-HP** — 70 -> 80 (+10)
+- `23:12:04` **TC** — 2 -> 4 (+2)
+- `23:12:04` **GOLD** — 393 -> 481 (+88)
+- `23:12:04` **FOOD+** — Boom Beans
+- `23:12:04` **LOOT-PTS** — 18 -> 19
+- `23:12:08` **TRINKET+** — Scoring
+- `23:12:15` **STATE** — `boss-baddie` -> `win`
+- `23:12:15` **POINTS** — 69217 -> 86521 (+17304)
+- `23:12:15` **DIE** — die#1: +['(p) Plus 1x Points multiplier']
+- `23:12:15` **TERMINAL** — state=`win`

@@ -1,0 +1,8 @@
+[project]
+name = "dontdieai"
+version = "0.0.1"
+description = "AI agent provider for Don't Die tournaments"
+requires-python = ">=3.11"
+
+[tool.setuptools]
+packages = ["dd_agent", "bot", "web"]

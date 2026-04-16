@@ -1,0 +1,126 @@
+	A	B	C	D	E	F	G	H	I	J	K	L	M	N	O	P	Q	R	S	T	U	V	W	X	Y
+Movement Die	EV
+1, 2, 2, 3, 3, 4	2.5
+Random Encounters	Rarity	Sometimes 2-3 Spaces in a row? (make a Set)
+Baddie	Common
+Big Baddie	Medium	Yes
+Campfire	Medium	Yes
+Mystery Event	Common
+Loot Die	Rare
+Obelisk	Medium	Yes
+Bub's Barter	Medium	Yes
+Guaranteed Encounters within the Chapters
+Campfire	One right before every Stop Fight
+Big Baddie	Stop Fight Chapter 1+2
+Obelisk	Stop Fight Chapter 3
+Boss Baddies	End of each Chapter, Stop Fight, Checkpoint Battle
+One Chapter is always 39 spaces!!
+Path Spaces until Stop Fight is shown - (always 25, then always 14)
+Chapter 1					Main Path		Forked Path		Total
+Example Path	Main Path	Forked Path		In this Example:	39	100%	11	100%	50	100%
+0	Start				Count	% + Guaranteed	Count	%	Count	%
+1	Baddie			Baddie	12	31%	3	27%	15	30%
+2	Baddie			Big Baddie	3	8%	1	9%	4	8%
+3	Mystery Event			Boss Baddie	1	3%	1	9%	2	4%
+4	Mystery Event			Campfire	5	13%	2	18%	7	14%
+5	Baddie			Mystery Event	10	26%	2	18%	12	24%
+6	Mystery Event			Loot Die	2	5%	0	0%	2	4%
+7	Loot Die			Obelisk	3	8%	0	0%	3	6%
+8	Bub's Barter	Campfire		Bub's Barter	3	8%	2	18%	5	10%
+9	Baddie	Campfire		Imp the Simp	0	0%	0	0%	0	0%
+10	Baddie	Big Baddie
+11	Campfire	Bub's Barter
+12	Campfire	Bub's Barter
+13	Big Baddie	Baddie
+14	Big Baddie	Baddie
+15	Mystery Event	Mystery Event
+16	Baddie	Mystery Event
+17	Mystery Event	Baddie
+18	Baddie
+19	Obelisk
+20	Mystery Event
+21	Bub's Barter
+22	Baddie
+23	Mystery Event
+24	Campfire	<- Must stop
+25	Big Baddie	<- Stop Fight
+26	Mystery Event
+27	Mystery Event
+28	Baddie
+29	Baddie
+30	Mystery Event
+31	Baddie
+32	Obelisk
+33	Obelisk
+34	Campfire
+35	Bub's Barter
+36	Loot Die
+37	Baddie
+38	Campfire	<- Must stop
+39	Boss Baddie	<- Stop Fight, Checkpoint
+Use the following resolution order to create the map
+Steps	Fill in order:	Frequency of Sets	Spaces in one 'set'
+1	Set Campfire at 24 and 38. Set space 25 according to Chapter count, set space 39 to Boss Baddie
+2	Determine Fork count + biomes	1 to 2		*pick 2-3 biomes randomly from available sets
+3	Determine length of Forks, Biomes, and starting positions		6 to 15	*pick final spots where the forks re-merge. All exit points need to be in spaces 16-23. Extend the paths for the appropriate length and create the forks. Check to ensure there are no entry points with 2 forks on the same space, if so, adjust 1 fork 1 space in either direction according to the rules
+4	Campfire	1 to 3	1 to 3	*does not count the one on spot 24 or 28
+5	Obelisk	1 to 2	1 to 3	*does not count Stop Fights
+6	Big Baddie	1 to 3	1 to 3	*does not count Stop Fights
+7	Loot Die	1 to 2	1 to 2
+8	Bub's Barter	2 to 5	1 to 3
+9	Baddie		1
+10	Mystery Event		1
+	**Key insight** - for each space type, roll for Set frequency first, before rolling for the amount of spaces in each Set
+Use the rules from the below if-then chart to fill in the Encounters (Steps 4-11)
+Campfire
+			Frequency				Spaces in Set
+			1	2	3		1	2	3
+Roll for:	Campfire		60%	30%	10%	If 1 campfire	0%	35%	65%
+						If 2 campfires	1	1	0
+						If 3 campfires	2	1	0
+These rolled sets must exist within Spaces 7 to 18. There must be at least 4 non-Campfire spaces in between Sets.
+If Campfire exists on the main path and the player will miss it by going on the forked path, it also will exist somewhere on the forked path. If a set containing 2 campfire spaces for example, a set of 2 campfire spaces will be featured somewhere on the forked path.
+Finally, place 1 Campfire on 1 random Space within 34-37
+Obelisk
+Set a 2-Space Obelisk set on Spaces 32+33
+Then, roll for additional Obelisks
+			Frequency				Spaces in Set
+			0	1			1	2	3
+Roll for:	Obelisk	If Chapter 1	90%	10%		If Chapter 1	80%	20%	0%
+		If Chapter 2	50%	50%		If Chapter 2	30%	35%	35%
+		If Chapter 3	25%	75%		If Chapter 3	0%	50%	50%
+Place these Obelisk sets either on the main path or on the forked path, choose randomly from equal odds.
+These Obelisk sets must exist within Spaces 15 to 21
+Big Baddie
+			Frequency				Spaces in Set
+			1	2	3		1	2	3
+Roll for:	Big Baddie	If Chapter 1	40%	60%	0%	If 1 Big Baddie	10%	30%	60%
+		If Chapter 2	20%	70%	10%	If 2 Big Baddies	50%	1	50%
+		If Chapter 3	20%	60%	20%	If 3 Big Baddies	2	1
+Place the Big Baddie sets either on the main path or on the forked path, choose randomly from equal odds. Each forked path can have a maximum of 1 Big Baddie Set
+Big Baddies must exist within Spaces 7 to 21. There must be at least 4 non-Big Baddie + non-Obelisk spaces in between Sets
+Loot Die
+			Frequency				Spaces in Set
+			0	1			1	2
+Roll for:	Loot Die	If Chapter 1	40%	60%		If 3 Big Baddie Sets	1	0
+		If Chapter 2	45%	55%		If else	50%	50%
+		If Chapter 3	50%	50%
+		*if no Loot Die has been placed in Chapters 1+2 before the first Stop Fight in those Chapters, one is guaranteed to be placed in Chapter 3
+Loot Die sets must exist within Spaces 3 to 23
+If the Loot Die exists on a space on the main path, and the player will miss it by going on the forked path, generate it somewhere on the forked path (campfire rules)
+Finally, place one single Loot Die space on a random unoccupied Space within 34-37
+Bub's Barter
+			Frequency					Spaces in Set
+		FORKED PATH	0	1			FORKED PATH	1	2
+Roll for:	Bub's Barter	If Forked path exists, place Bub's on forked path?	65%	35%				50%	50%
+			Frequency					Spaces in Set
+		MAIN PATH	1	2			MAIN PATH	1	2	3
+		If Chapter 1 + 2	70%	30%			If 1 Bubs	40%	50%	10%
+		If Chapter 3	1	0			If 2 Bubs	2	0	0
+Roll for the Forked Path first
+Bub's spaces must exist within Spaces 7 to 23. There must be at least 6 spaces in between Bub's.
+Finally, place one single Bub's space on a random unoccupied Space within 34-37
+Baddie
+Mystery Event
+Place a Baddie space on the unoccupied Space within 34-37
+Of the remaining spaces on the Main Path and Forked Paths, fill at least 55% of them with Baddies, then fill the remainder with Mystery Events

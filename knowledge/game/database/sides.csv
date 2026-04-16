@@ -1,0 +1,82 @@
+pool,biome,effect,exhaust
+Starter,None,Attack 4,No
+Starter,None,Attack all 4,No
+Starter,None,"Attack 6, Bleed 2",No
+Starter,None,Gain 3 Strength,Yes
+Starter,None,Poison 3,No
+Starter,None,Block 6,No
+Starter,None,"Freeze all 3, Block 10",Yes
+Starter,None,Gain 3 Armor,Yes
+(+10),None,"Attack 14, Gain 2 Strength",No
+(+10),None,Attack all 10,No
+(+10),None,Block 3 anytime you Attack,Yes
+(+10),None,Block 5 at the end of each turn,Yes
+(+10),None,Block 8 per Baddie,No
+(+10),None,Block 24 if you have no Block,No
+(+10),None,Score 3 Points times Attack on this Die,No
+(+10),None,Score 2 Points times the current Health of All Baddies,No
+(+10),None,Score 100 Points any time you Block,Yes
+(+10),Ice Cave,"Attack 12, Freeze 3",No
+(+10),Ice Cave,"Attack 10. If Baddie is Freezing, Attack +20",No
+(+10),Ice Cave,"Block 8, Gain 1 Armor",No
+(+10),Ice Cave,"Block 8 per Freeze or Bleed on you. Otherwise, Block 10",No
+(+10),Ice Cave,Block 3 times the current turn,No
+(+10),Toxic Swamp,"Poison 8, Heal 1",No
+(+10),Toxic Swamp,"Poison 4, 2 times",No
+(+10),Toxic Swamp,Poison all 4,No
+(+10),Toxic Swamp,"Block 8, Poison 3",No
+(+10),Toxic Swamp,Heal 2 at the end of each turn,Yes
+(+10),Volcano,Attack 2 per Attack Side on this Die,No
+(+10),Volcano,"Attack 16, Duplicate this Side onto this Die",Yes
+(+10),Volcano,"Block 8, Bleed 3",No
+(+20),None,"Attack 6, 2 times",No
+(+20),None,"Block 4. Remove leftmost debuff, Exhaust all Curses",No
+(+20),None,Block 18. Score 50 Points,No
+(+20),None,Score 100 Points per Trinket you have,Yes
+(+20),None,Score 1 Point per the collective Points all your Dice are worth,Yes
+(+20),None,Score 1 Point per Poison on all Baddies,Yes
+(+20),Ice Cave,"Attack 16, Bleed 2, Freeze 2",No
+(+20),Ice Cave,Block equal to your largest Attack value on this Die,No
+(+20),Ice Cave,Attack equal to Block,No
+(+20),Ice Cave,Block 2. Permanently increase the Block gained on this Side by 4,Yes
+(+20),Ice Cave,Stack Block for 3 turns,No
+(+20),Ice Cave,Gain 2 Armor at the end of each turn,No
+(+20),Toxic Swamp,Attack 4. Heal equal to unblocked Damage,Yes
+(+20),Toxic Swamp,"Poison all 2, 3 times",Yes
+(+20),Toxic Swamp,"Freeze all 3, Bleed 4, Poison 5",Yes
+(+20),Toxic Swamp,All Baddies lose 15 Strength this turn,Yes
+(+20),Toxic Swamp,Remove all debuffs,No
+(+20),Toxic Swamp,Heal 8 after the battle,Yes
+(+20),Volcano,2x the value of your largest Attack on this Die,Yes
+(+20),Volcano,Attack 16. Permanently increase the Attack on this Side by +2,Yes
+(+20),Volcano,Exhaust all Attack 4 sides. Do it's collective Attack to all Baddies,Yes
+(+20),Volcano,Attack 28,No
+(+20),Volcano,Attack 6 per Exhausted Side,No
+(+20),Volcano,Gain 4 Strength at the end of each turn,No
+(+30),None,Increase Damage by 2x next turn,No
+(+30),None,Increase Points by 1x,Yes
+(+30),None,"Increase Points by 3x. Every turn, decrease Points by 1x",Yes
+(+30),None,Copy the next Die's effect,No
+(+30),None,Re-roll your rightmost Die every turn,Yes
+(+30),None,Increase the values on all other Dice by 1,No
+(+30),Ice Cave,Block 12 at the end of each turn,Yes
+(+30),Ice Cave,Block 40,Yes
+(+30),Ice Cave,Negate Damage 2 times,Yes
+(+30),Toxic Swamp,Increase all values on this Die by 3,Yes
+(+30),Toxic Swamp,2x Poison,No
+(+30),Toxic Swamp,Poison All 1 whenever you Block,Yes
+(+30),Toxic Swamp,Cure Poison at the start of your turn,Yes
+(+30),Volcano,Attack all 32. Exhaust a Side on this Die,Yes
+(+30),Volcano,"All Bleed 5, Re-roll this Die",Yes
+(+30),Volcano,Increase Damage by 1x. Anything rolled has 33% chance of Exhausting,Yes
+(+30),Volcano,2x the values on 3 random Sides of this Die,Yes
+Echo Dagger,None,"Attack 22. If fatal, Attack again",No
+Curse,None,Lose 50 Points,No
+Curse,None,Lose 100 Points,No
+Curse,None,Lose 2 hp,No
+Curse,None,Poison self 1,No
+Curse,None,Freeze self 2,No
+Curse,None,Bleed self 1,No
+Curse,None,Exhaust a random Side on this Die,Yes
+Curse,None,Decrease all values by 1 on this Die,Yes
+Curse,None,Duplicate this Side on this Die,No
