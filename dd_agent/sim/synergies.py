@@ -485,8 +485,8 @@ COMBO_RULES = [
     ),
     ComboRule(
         name="scoring_below_survival_floor",
-        bonus=0.5,
-        description="PENALTY: any scoring side before the survival floor is met",
+        bonus=0.05,
+        description="PENALTY: any scoring side before the survival floor is met — near-zero",
         check=lambda target_die, side, all_dice, idx: (
             is_scoring(side) and not _survival_floor_met(all_dice)
         ),

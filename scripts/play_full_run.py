@@ -2234,6 +2234,57 @@ async def _nearest_bb_in_reach(dd, character_id, max_steps: int = 3):
     return nearest
 
 
+async def _next_bb_before_campfire(dd, character_id):
+    """Scan the map for the next big-baddie/boss-baddie that appears
+    before the next campfire. Returns the same dict shape as
+    _nearest_bb_in_reach, or None if a campfire comes first (or no
+    boss is ahead).
+    """
+    try:
+        game = await dd.get_game(character_id)
+    except Exception:
+        return None
+    if not isinstance(game, dict):
+        return None
+    last = game.get("lastSession") or {}
+    md = last.get("mapData") or {}
+    progress = last.get("progress") or {}
+    cur_idx = int(progress.get("currentIndex", 0) or 0)
+    active_path = progress.get("activePath") or "main"
+    chapter = last.get("chapter")
+    upcoming_boss = game.get("upcoming_boss")
+    upcoming_bb_code = game.get(f"upcoming_bb_{active_path}")
+    key = {"main": "mainPathNodes", "fork1": "fork1Nodes", "fork2": "fork2Nodes"}.get(
+        active_path, "mainPathNodes"
+    )
+    nodes = sorted(
+        [n for n in (md.get(key) or []) if isinstance(n, dict)],
+        key=lambda n: n.get("index", 0) or 0,
+    )
+    for n in nodes:
+        idx = n.get("index", 0) or 0
+        if idx <= cur_idx:
+            continue
+        ttype = (n.get("type") or "").lower()
+        if ttype == "campfire":
+            return None
+        if ttype in ("big-baddie", "boss-baddie"):
+            result = {
+                "type": ttype,
+                "biome": n.get("biome"),
+                "index": idx,
+                "steps_away": idx - cur_idx,
+                "chapter": chapter,
+                "upcoming_boss": upcoming_boss,
+                "upcoming_bb_code": upcoming_bb_code,
+            }
+            result["stress_enemy_key"] = _stress_enemy_for(
+                upcoming_boss, upcoming_bb_code, chapter, ttype,
+            )
+            return result
+    return None
+
+
 def _dices_after_burn(dices, burn_die_id, burn_ability_id):
     """Return a deep-copy of `dices` with the burn target side removed."""
     import copy as _copy
@@ -2382,7 +2433,7 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
             f"HP {current_hp}/{max_hp} ({hp_pct:.0%}) — force burn at high HP",
         )
     elif not carrying_curse:
-        near_bb = await _nearest_bb_in_reach(dd, character_id, max_steps=3)
+        near_bb = await _next_bb_before_campfire(dd, character_id)
         if near_bb:
             if near_bb["type"] == "boss-baddie":
                 stress_label = near_bb["upcoming_boss"] or "?"
@@ -3452,18 +3503,33 @@ async def handle_mystery(dd, logger, session_id, iteration, setup, character_id=
         return
 
     if event == "Yin Yang":
-        # Duplicate a boss-tier (Level 3 Boss) side if we have one, else skip
+        # Duplicate a boss-tier (Level 3 Boss) side if we have one and can afford it
         die_id, ability_id, label = _yin_yang_target(dices)
-        if ability_id:
-            logger.log(f"  Yin Yang: duplicating {label}")
-            await try_call(
+        gold = 0
+        if ability_id and character_id:
+            char_check = await try_call(
+                logger, f"it{iteration:03d}_mystery_yy_char",
+                dd.get_character(session_id)
+            )
+            if isinstance(char_check, dict):
+                gold = int(char_check.get("gold") or 0)
+        if ability_id and gold >= 50:
+            logger.log(f"  Yin Yang: duplicating {label} (gold={gold})")
+            result = await try_call(
                 logger, f"it{iteration:03d}_mystery_yy",
                 dd._post("/api/game/mystery/yinyang",
                           sessionId=session_id, pickType="dupe",
                           diceId=die_id, abilityId=ability_id)
             )
+            if result is None:
+                logger.log(f"  Yin Yang: dupe failed, skipping")
+                await try_call(
+                    logger, f"it{iteration:03d}_mystery_yy_exit",
+                    dd._post("/api/game/mystery/exit", sessionId=session_id)
+                )
         else:
-            logger.log("  Yin Yang: no boss-tier side; skipping")
+            reason = "no boss-tier side" if not ability_id else f"insufficient gold ({gold})"
+            logger.log(f"  Yin Yang: {reason}; skipping")
             await try_call(
                 logger, f"it{iteration:03d}_mystery_yy_exit",
                 dd._post("/api/game/mystery/exit", sessionId=session_id)
