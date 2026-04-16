@@ -2496,11 +2496,11 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
             # so HP end doesn't matter — only winrate.
             is_boss = near_bb["type"] == "boss-baddie"
             best = options[0]
-            if best[0] == "rest" and hp_pct > 0.50:
+            if best[0] == "rest" and hp_pct > 0.50 and best[2] >= 0.50:
                 burn_opt = next((o for o in options if o[0] == "burn"), None)
                 if burn_opt and best[2] - burn_opt[2] <= 0.10:
                     hp_end_gap = best[3] - burn_opt[3]
-                    if is_boss or hp_end_gap < 10:
+                    if (is_boss and burn_opt[2] >= 0.50) or hp_end_gap < 10:
                         logger.log(
                             f"    burn within 10% of rest "
                             f"({burn_opt[2]:.0%} vs {best[2]:.0%}, "
