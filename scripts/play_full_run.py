@@ -580,7 +580,8 @@ def _score_single_tile(node: dict, dice_readiness: float, biome_sim_results: dic
     biome_sim_results = biome_sim_results or {}
 
     if ttype in ("big-baddie", "boss-baddie"):
-        win_rate, median_loss = biome_sim_results.get(b, (0.0, 60))
+        sim_result = biome_sim_results.get(b, (0.0, 60, 0))
+        win_rate, median_loss = sim_result[0], sim_result[1]
         if win_rate >= 0.5 and median_loss < 20:
             base = 12
         elif win_rate >= 0.5:
@@ -767,6 +768,25 @@ async def _should_reroll_movement(
     # User 2026-04-14: TC spends on map rerolls are HIGHER priority than
     # battle rewinds. Lower the cost penalty and be aggressive.
     reroll_cost_penalty = 2.0
+
+    # Don't waste TC when the vast majority of outcomes land on the same
+    # tile type. E.g. if 5/6 die faces land on big-baddie, rerolling is
+    # an 83% chance of the same result for 2 TC.
+    if current_score < 0 and reachable:
+        same_type_prob = sum(
+            prob for _, prob, _, tile_score in reachable
+            if tile_score <= current_score + 5
+        )
+        if same_type_prob >= 0.75:
+            logger.log(
+                f"  reroll check: idx={current_idx} rolled={rolled_steps} "
+                f"cur_score={current_score:.1f} ev(reroll)={ev:.1f} "
+                f"tc={tc}/cost={next_reroll_cost} → reroll=False "
+                f"(skip: {same_type_prob:.0%} of outcomes are equally bad)"
+            )
+            logger.log(f"    reachable: {reachable}")
+            return False
+
     rolled_4 = (rolled_steps == 4)
     if rolled_4:
         # Rolling a 4 is blind-walking (UI/scorer only sees 4 tiles ahead).
@@ -799,16 +819,20 @@ _BIOME_STRESS_ENEMY = {
 
 async def _sim_big_baddie_survival(dices, biome, player_hp, player_max,
                                      trials=60, enemy_key=None):
-    """Return (win_rate, median_hp_loss) simming the current dice against
-    the stress big-baddie. If `enemy_key` is provided, use it directly
-    (authoritative from game-state `upcoming_boss`/`upcoming_bb_*`);
-    otherwise fall back to biome-based `_BIOME_STRESS_ENEMY`.
+    """Return (win_rate, median_hp_loss, mean_hp_end) simming the current
+    dice against the stress big-baddie. If `enemy_key` is provided, use
+    it directly (authoritative from game-state `upcoming_boss`/
+    `upcoming_bb_*`); otherwise fall back to biome-based
+    `_BIOME_STRESS_ENEMY`.
 
-    On any failure returns (0.0, player_max) — caller treats that as
+    mean_hp_end includes losses (0 HP) so it reflects expected HP after
+    the fight across all outcomes, not just wins.
+
+    On any failure returns (0.0, player_max, 0) — caller treats that as
     "too risky".
     """
     if not dices:
-        return (0.0, player_max)
+        return (0.0, player_max, 0)
     try:
         import random as _rnd
         from dd_agent.sim.battle import PlayerState, simulate_battle
@@ -818,15 +842,16 @@ async def _sim_big_baddie_survival(dices, biome, player_hp, player_max,
         _sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
         from scripts.analyze_run import live_dice_to_sim_dice  # type: ignore
     except Exception:
-        return (0.0, player_max)
+        return (0.0, player_max, 0)
 
     if enemy_key is None:
         enemy_key = _BIOME_STRESS_ENEMY.get(biome, "wendibrrr")
     if enemy_key not in ENEMIES:
-        return (0.0, player_max)
+        return (0.0, player_max, 0)
 
     wins = 0
     hp_losses = []
+    all_hp_ends = []
     for i in range(trials):
         try:
             sim_dice = live_dice_to_sim_dice(dices)
@@ -835,7 +860,8 @@ async def _sim_big_baddie_survival(dices, biome, player_hp, player_max,
             rng = _rnd.Random(i)
             result = simulate_battle(player, [enemy], rng)
         except Exception:
-            return (0.0, player_max)
+            return (0.0, player_max, 0)
+        all_hp_ends.append(result.player_hp_end)
         if result.won:
             wins += 1
             hp_losses.append(player_hp - result.player_hp_end)
@@ -845,7 +871,8 @@ async def _sim_big_baddie_survival(dices, biome, player_hp, player_max,
         median_loss = hp_losses[len(hp_losses) // 2]
     else:
         median_loss = player_max
-    return (win_rate, median_loss)
+    mean_hp_end = sum(all_hp_ends) / len(all_hp_ends) if all_hp_ends else 0
+    return (win_rate, median_loss, mean_hp_end)
 
 # Tile-type scores. Positive = want to land on it, negative = avoid.
 # These dominate the fork decision because "what's actually on the path"
@@ -2266,11 +2293,18 @@ async def _next_bb_before_campfire(dd, character_id):
         [n for n in (md.get(key) or []) if isinstance(n, dict)],
         key=lambda n: n.get("index", 0) or 0,
     )
+    # Skip past any campfire tiles that are adjacent to the current
+    # position — the player is already at a campfire, so consecutive
+    # campfire tiles don't count as "a campfire before the boss".
+    past_campfire_cluster = False
     for n in nodes:
         idx = n.get("index", 0) or 0
         if idx <= cur_idx:
             continue
         ttype = (n.get("type") or "").lower()
+        if ttype == "campfire" and not past_campfire_cluster:
+            continue
+        past_campfire_cluster = True
         if ttype == "campfire":
             return None
         if ttype in ("big-baddie", "boss-baddie"):
@@ -2322,26 +2356,26 @@ async def _sim_campfire_options(
     """
     results = []
 
-    base_wr, base_hp_loss = await _sim_big_baddie_survival(
+    base_wr, base_hp_loss, base_mean_hp = await _sim_big_baddie_survival(
         dices, biome, current_hp, max_hp, trials=40, enemy_key=enemy_key,
     )
-    base_hp_end = max(0, current_hp - int(base_hp_loss))
+    base_hp_end = int(base_mean_hp)
     results.append(("baseline", None, base_wr, base_hp_end))
 
     rest_hp = min(max_hp, current_hp + int(max_hp * 0.4))
-    rest_wr, rest_hp_loss = await _sim_big_baddie_survival(
+    rest_wr, rest_hp_loss, rest_mean_hp = await _sim_big_baddie_survival(
         dices, biome, rest_hp, max_hp, trials=40, enemy_key=enemy_key,
     )
-    rest_hp_end = max(0, rest_hp - int(rest_hp_loss))
+    rest_hp_end = int(rest_mean_hp)
     results.append(("rest", "pick-rest", rest_wr, rest_hp_end))
 
     burn_dices = _dices_after_burn(dices, burn_die_id, burn_ability_id)
     if burn_dices:
-        burn_wr, burn_hp_loss = await _sim_big_baddie_survival(
+        burn_wr, burn_hp_loss, burn_mean_hp = await _sim_big_baddie_survival(
             burn_dices, biome, current_hp, max_hp, trials=40,
             enemy_key=enemy_key,
         )
-        burn_hp_end = max(0, current_hp - int(burn_hp_loss))
+        burn_hp_end = int(burn_mean_hp)
         results.append(("burn", "pick-burn", burn_wr, burn_hp_end))
 
     # Sort: primary by winrate, secondary by hp_end
