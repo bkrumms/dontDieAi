@@ -2620,7 +2620,10 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
             dd._post("/api/game/campfire/loot",
                       sessionId=session_id, lootType="choose-boost")
         )
-        if r is not None and total_after > MAX_FOODS:
+        # choose-boost can return null on success (action consumed, no body).
+        # If setup had receivingBoosts, proceed with pick-boost regardless —
+        # if it truly failed, pick-boost will also fail and we exit cleanly.
+        if total_after > MAX_FOODS:
             weakest = _pick_weakest_food(existing_foods)
             if weakest and isinstance(weakest, dict):
                 weakest_id = weakest.get("id") or weakest.get("uuid")
@@ -2646,13 +2649,42 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
                 best_id = best.get("uuid") or best.get("id")
                 best_type = best.get("type") or "?"
                 logger.log(f"    pick-boost: keeping {best_type}")
-                r = await try_call(
+                await try_call(
                     logger, f"it{iteration:03d}_campfire_pick-boost",
                     dd._post("/api/game/campfire/loot",
                               sessionId=session_id,
                               lootType="pick-boost",
                               boostMeta={"boostId": best_id})
                 )
+        else:
+            # total_after <= MAX_FOODS, no discard needed — just pick best
+            best = None
+            best_score = -1
+            for b in setup_recv:
+                if not isinstance(b, dict):
+                    continue
+                ftype = b.get("type") or ""
+                score = _FOOD_VALUE.get(ftype, 50)
+                if score > best_score:
+                    best_score = score
+                    best = b
+            if best is not None:
+                best_id = best.get("uuid") or best.get("id")
+                best_type = best.get("type") or "?"
+                logger.log(f"    pick-boost: keeping {best_type}")
+                await try_call(
+                    logger, f"it{iteration:03d}_campfire_pick-boost",
+                    dd._post("/api/game/campfire/loot",
+                              sessionId=session_id,
+                              lootType="pick-boost",
+                              boostMeta={"boostId": best_id})
+                )
+        # choose-boost flow complete — exit campfire, don't fall through to rest
+        await try_call(
+            logger, f"it{iteration:03d}_campfire_exit",
+            dd._post("/api/game/campfire/exit", sessionId=session_id)
+        )
+        return
     else:
         r = await try_call(
             logger, f"it{iteration:03d}_campfire_{loot_type}",
