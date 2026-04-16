@@ -2490,15 +2490,31 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
             # Prefer burn when rest's winrate advantage is marginal AND
             # HP is healthy enough to absorb it. Below 50% HP, always
             # respect the sim's rest preference — survival trumps compounding.
+            # Also check HP end: if rest leaves significantly more HP after
+            # the fight, prefer rest (we need that HP for subsequent fights).
+            # Exception: boss-baddie (Ganondwarf) gives a full heal after,
+            # so HP end doesn't matter — only winrate.
+            is_boss = near_bb["type"] == "boss-baddie"
             best = options[0]
             if best[0] == "rest" and hp_pct > 0.50:
                 burn_opt = next((o for o in options if o[0] == "burn"), None)
                 if burn_opt and best[2] - burn_opt[2] <= 0.10:
-                    logger.log(
-                        f"    burn within 10% of rest "
-                        f"({burn_opt[2]:.0%} vs {best[2]:.0%}) — preferring burn (compounds)"
-                    )
-                    best = burn_opt
+                    hp_end_gap = best[3] - burn_opt[3]
+                    if is_boss or hp_end_gap < 10:
+                        logger.log(
+                            f"    burn within 10% of rest "
+                            f"({burn_opt[2]:.0%} vs {best[2]:.0%}, "
+                            f"hp_end {burn_opt[3]} vs {best[3]}) "
+                            f"— preferring burn (compounds)"
+                        )
+                        best = burn_opt
+                    else:
+                        logger.log(
+                            f"    burn within 10% winrate of rest "
+                            f"({burn_opt[2]:.0%} vs {best[2]:.0%}) but "
+                            f"rest HP end {best[3]} >> burn HP end {burn_opt[3]} "
+                            f"— keeping rest (need HP for later fights)"
+                        )
             if best[1] is None:  # baseline won — fall through to rest
                 sim_override = ("pick-rest", f"sim baseline@{best[3]}, rest as safe default")
             else:
