@@ -787,6 +787,37 @@ async def _should_reroll_movement(
             logger.log(f"    reachable: {reachable}")
             return False
 
+    # Low-HP safety reroll: when HP is critical and we landed on a baddie,
+    # prefer rerolling toward mystery/campfire/bub tiles at distance 2-3
+    # (the 33% probability slots). Mysteries can't kill you and may give
+    # free burns/buffs/healing. Only applies when build is already strong
+    # (5+ upgrades) so we're not sacrificing upgrade opportunities.
+    hp_pct_now = hp / max_hp if max_hp else 1.0
+    total_upgrades = sum(
+        1 for d in dices for ab in (d.get("ability") or [])
+        if isinstance(ab, dict) and "Starter" not in
+        [t.get("label") for t in (ab.get("tags") or []) if isinstance(t, dict)]
+    ) if dices else 0
+    current_is_baddie = "baddie" in (current_tile.get("type", "") if isinstance(current_tile, dict) else "")
+
+    if (hp_pct_now < 0.40 and current_is_baddie and total_upgrades >= 5
+            and tc >= next_reroll_cost):
+        safe_tiles_at_2_3 = sum(
+            1 for steps, prob, label, score in reachable
+            if steps in (2, 3) and any(
+                t in label for t in ("mystery", "campfire", "bub", "loot-die")
+            )
+        )
+        if safe_tiles_at_2_3 >= 1:
+            logger.log(
+                f"  reroll check: idx={current_idx} rolled={rolled_steps} "
+                f"cur_score={current_score:.1f} ev(reroll)={ev:.1f} "
+                f"tc={tc}/cost={next_reroll_cost} → reroll=True "
+                f"(low HP {hp_pct_now:.0%}, {safe_tiles_at_2_3}/2 safe tiles at distance 2-3)"
+            )
+            logger.log(f"    reachable: {reachable}")
+            return True
+
     rolled_4 = (rolled_steps == 4)
     if rolled_4:
         # Rolling a 4 is blind-walking (UI/scorer only sees 4 tiles ahead).
