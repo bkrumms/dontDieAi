@@ -316,6 +316,42 @@ _BIOME_PRIORITY = {
 }
 
 
+def _count_offensive_upgrades(dice: list) -> int:
+    """Count non-starter sides classified as attack/poison across all dice."""
+    count = 0
+    for die in (dice or []):
+        if not isinstance(die, dict):
+            continue
+        for ab in (die.get("ability") or []):
+            if not isinstance(ab, dict):
+                continue
+            tags = [t.get("label") for t in (ab.get("tags") or []) if isinstance(t, dict)]
+            if "Starter" in tags:
+                continue
+            cat = classify_side(ab)
+            if cat == "attack":
+                count += 1
+    return count
+
+
+def _count_defensive_upgrades(dice: list) -> int:
+    """Count non-starter sides classified as defense across all dice."""
+    count = 0
+    for die in (dice or []):
+        if not isinstance(die, dict):
+            continue
+        for ab in (die.get("ability") or []):
+            if not isinstance(ab, dict):
+                continue
+            tags = [t.get("label") for t in (ab.get("tags") or []) if isinstance(t, dict)]
+            if "Starter" in tags:
+                continue
+            cat = classify_side(ab)
+            if cat == "defense":
+                count += 1
+    return count
+
+
 def choose_die_for_upgrade(dice: list, biome: str = None) -> int:
     """Choose which die to upgrade given the current dice state and the
     biome of the fight we just won.
@@ -325,16 +361,26 @@ def choose_die_for_upgrade(dice: list, biome: str = None) -> int:
     poison. Route the pick to the die whose role matches the pool so the
     offered sides synergize with where they land.
 
+    Balance rule: if defensive upgrades outnumber offensive upgrades,
+    bias toward offensive dice (attack/utility) regardless of biome to
+    prevent all-block builds that lack kill speed.
+
     Returns the 0-indexed die to pick. Uses lowest NON-STARTER count
     within the biome-specific priority order as a tiebreak.
     """
     if not dice:
         return 0
 
-    # Sort by order field so list index matches the player-facing die order.
     ordered = sorted(dice, key=lambda d: d.get("order", 0) if isinstance(d, dict) else 0)
 
-    priority = _BIOME_PRIORITY.get(biome, _BIOME_PRIORITY[None])
+    off_count = _count_offensive_upgrades(ordered)
+    def_count = _count_defensive_upgrades(ordered)
+
+    if def_count > off_count and def_count >= 2:
+        priority = [0, 1, 2, 3]
+    else:
+        priority = _BIOME_PRIORITY.get(biome, _BIOME_PRIORITY[None])
+
     best_order = None
     best_count = 999
     for p in priority:

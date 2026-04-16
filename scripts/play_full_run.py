@@ -235,6 +235,7 @@ def _die_order_signals(die: dict) -> dict:
         "poison_applier": has(lambda l: label_applies_debuff(l, "poison")),
         "poison_consumer": has(lambda l: "if" in l and "poison" in l),
         "copy_next": has(lambda l: "copy" in l and "next" in l and "die" in l),
+        "block_if_no_block": has(lambda l: "if you have no block" in l),
     }
 
 
@@ -290,6 +291,10 @@ def _compute_optimal_order(dices: list) -> list:
             r = 22
         elif s["poison_applier"] and any_poison_consumer and not s["poison_consumer"]:
             r = 24
+        # "Block N if you have no block" must be slot 1 — it's useless
+        # after any other die has already rolled block.
+        elif s["block_if_no_block"]:
+            r = 5
         else:
             r = 50  # neutral
 
@@ -2684,7 +2689,16 @@ async def handle_bub(dd, logger, session_id, character_id, iteration):
 
     # Score each offered side against each die and pick the top 2 whose
     # best placement beats a minimum score threshold.
-    from dd_agent.sim.upgrade_picker import score_side_for_die, DIE_ROLES
+    # Balance rule: if the build is defense-heavy and lacks offensive
+    # upgrades, boost attack/poison side scores to restore kill speed.
+    from dd_agent.sim.upgrade_picker import (
+        score_side_for_die, classify_side, DIE_ROLES,
+        _count_offensive_upgrades, _count_defensive_upgrades,
+    )
+    off_count = _count_offensive_upgrades(dices_after)
+    def_count = _count_defensive_upgrades(dices_after)
+    needs_offense = def_count > off_count and def_count >= 2
+
     side_scores = []
     for it in side_items:
         payload = it.get("payload") or {}
@@ -2702,6 +2716,8 @@ async def handle_bub(dd, logger, session_id, character_id, iteration):
             if s > best_score:
                 best_score = s
                 best_die_idx = di
+        if needs_offense and classify_side(payload) == "attack":
+            best_score *= 2.0
         side_scores.append((best_score, it, best_die_idx))
     side_scores.sort(key=lambda x: -x[0])
 
@@ -3250,20 +3266,22 @@ async def handle_mystery(dd, logger, session_id, iteration, setup, character_id=
             return
 
         if event == "Health Points":
-            # Prioritize full healing + time crystals based on current HP
+            # Options: 1=-5000pts/+30hp/+3TC, 2=-2000pts/+10hp/+2TC,
+            #          3=-750pts/+5hp/+1TC, 4=+100pts (free)
             hp_pct = current_hp / max_hp if max_hp else 1.0
-            if hp_pct < 0.3:
-                pick = "1"  # -5000 pts, +30 hp, +3 TC
-                reason = f"HP {hp_pct:.0%} critical"
-            elif hp_pct < 0.6:
-                pick = "2"  # -2000 pts, +10 hp, +2 TC
-                reason = f"HP {hp_pct:.0%} low"
-            elif hp_pct < 0.85:
-                pick = "3"  # -750 pts, +5 hp, +1 TC
-                reason = f"HP {hp_pct:.0%} mid"
+            pts = int(char.get("points", 0) or 0) if isinstance(char, dict) else 0
+            if hp_pct < 0.3 and pts >= 5000:
+                pick = "1"
+                reason = f"HP {hp_pct:.0%} critical, pts={pts}"
+            elif hp_pct < 0.6 and pts >= 2000:
+                pick = "2"
+                reason = f"HP {hp_pct:.0%} low, pts={pts}"
+            elif hp_pct < 0.85 and pts >= 750:
+                pick = "3"
+                reason = f"HP {hp_pct:.0%} mid, pts={pts}"
             else:
-                pick = "4"  # +100 pts free (no cost)
-                reason = f"HP {hp_pct:.0%} healthy"
+                pick = "4"
+                reason = f"HP {hp_pct:.0%}, pts={pts}, taking free 100pts"
             logger.log(f"  Health Points: picking option {pick} ({reason})")
             await try_call(
                 logger, f"it{iteration:03d}_mystery_hp",
