@@ -2515,7 +2515,16 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
                             f"rest HP end {best[3]} >> burn HP end {burn_opt[3]} "
                             f"— keeping rest (need HP for later fights)"
                         )
-            if best[1] is None:  # baseline won — fall through to rest
+            # When ALL options have sub-50% winrate, neither rest nor burn
+            # will reliably save the run. Pick food instead — a lucky pull
+            # (Godmode Guac, Brrrito, etc.) can completely flip the fight.
+            if best[2] < 0.50:
+                logger.log(
+                    f"    all sim options below 50% (best={best[0]}@{best[2]:.0%}) "
+                    f"— choosing food (hail mary)"
+                )
+                sim_override = ("choose-boost", f"sim hopeless ({best[0]}={best[2]:.0%}@{best[3]}), food hail mary")
+            elif best[1] is None:  # baseline won — fall through to rest
                 sim_override = ("pick-rest", f"sim baseline@{best[3]}, rest as safe default")
             else:
                 sim_override = (best[1], f"sim {best[0]}={best[2]:.0%}@{best[3]}")
