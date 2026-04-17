@@ -492,6 +492,29 @@ COMBO_RULES = [
         ),
     ),
     # ============================================================
+    # BAIT SIDE PENALTIES
+    # ============================================================
+    ComboRule(
+        name="block_stacks_bait_early",
+        bonus=0.2,
+        description="PENALTY: 'Block stacks for N turns' is bait early game — needs "
+                    "multiple turns of block-rolling to compound, which early dice can't "
+                    "guarantee. Conditional block (per-Freeze, per-Baddie) is far better.",
+        check=lambda target_die, side, all_dice, idx: (
+            "block stacks" in _label(side) and not _survival_floor_met(all_dice)
+        ),
+    ),
+    ComboRule(
+        name="block_equal_to_largest_attack_bait",
+        bonus=0.15,
+        description="PENALTY: 'Block equal to largest Attack value on this Die' is nearly "
+                    "always worse than a flat block side — bounded by the die's attacks "
+                    "and competes with actual block sides.",
+        check=lambda target_die, side, all_dice, idx: (
+            "block equal to largest attack" in _label(side)
+        ),
+    ),
+    # ============================================================
     # BIOME × DIE ROUTING (per user 2026-04-13)
     # Ice Cave → defensive / freeze → starter Die 3 / Die 4 (idx 2/3)
     # Volcano  → offensive / exhaust-buffs → starter Die 1 / 2 / 3 (idx 0/1/2)

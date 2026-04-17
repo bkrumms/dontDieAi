@@ -88,9 +88,14 @@ def classify_side(side: dict) -> str:
         return "scoring"
 
     # 2. Label-based detection (covers conditional/special-effect sides)
-    if "block" in label or "armor" in label:
-        # Exception: "Block 8, Poison 3" is primarily offensive (poison ticks)
-        if "poison" in label or "bleed" in label:
+    if "unblocked" in label and ("heal" in label or "attack" in label):
+        return "heal"
+    if "block" in label or "armor" in label or "attack equal to block" in label:
+        # "Block 8, Poison 3" / "Block 8, Bleed 3" are primarily offensive
+        # (poison/bleed ticks do the real work). But "Block 8 per Freeze or
+        # Bleed on you" is a conditional block side — the "bleed" refers to
+        # a debuff ON THE PLAYER, not applied to enemies.
+        if ("poison" in label or "bleed" in label) and "per" not in label and "on you" not in label:
             return "attack"
         return "defense"
     if "attack" in label or "damage" in label:
