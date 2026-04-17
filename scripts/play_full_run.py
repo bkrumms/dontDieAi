@@ -849,12 +849,15 @@ _BIOME_STRESS_ENEMY = {
 
 
 async def _sim_big_baddie_survival(dices, biome, player_hp, player_max,
-                                     trials=60, enemy_key=None):
+                                     trials=60, enemy_key=None, foods=None):
     """Return (win_rate, median_hp_loss, mean_hp_end) simming the current
     dice against the stress big-baddie. If `enemy_key` is provided, use
     it directly (authoritative from game-state `upcoming_boss`/
     `upcoming_bb_*`); otherwise fall back to biome-based
     `_BIOME_STRESS_ENEMY`.
+
+    If `foods` is provided (list of food type strings), apply their
+    effects to the player before each sim trial.
 
     mean_hp_end includes losses (0 HP) so it reflects expected HP after
     the fight across all outcomes, not just wins.
@@ -872,6 +875,7 @@ async def _sim_big_baddie_survival(dices, biome, player_hp, player_max,
         from pathlib import Path as _P
         _sys.path.insert(0, str(_P(__file__).resolve().parent.parent))
         from scripts.analyze_run import live_dice_to_sim_dice  # type: ignore
+        from scripts.sim_food_effects import _apply_food
     except Exception:
         return (0.0, player_max, 0)
 
@@ -887,9 +891,15 @@ async def _sim_big_baddie_survival(dices, biome, player_hp, player_max,
         try:
             sim_dice = live_dice_to_sim_dice(dices)
             player = PlayerState(hp=player_hp, max_hp=player_max, dice=sim_dice)
-            enemy = ENEMIES[enemy_key]()
+            enemies = [ENEMIES[enemy_key]()]
+            if foods:
+                for food_type in foods:
+                    try:
+                        _apply_food(food_type, player, enemies)
+                    except Exception:
+                        pass
             rng = _rnd.Random(i)
-            result = simulate_battle(player, [enemy], rng)
+            result = simulate_battle(player, enemies, rng)
         except Exception:
             return (0.0, player_max, 0)
         all_hp_ends.append(result.player_hp_end)
@@ -2375,20 +2385,21 @@ def _dices_after_burn(dices, burn_die_id, burn_ability_id):
 
 async def _sim_campfire_options(
     logger, dices, current_hp, max_hp, biome,
-    burn_die_id, burn_ability_id, enemy_key=None,
+    burn_die_id, burn_ability_id, enemy_key=None, foods=None,
 ):
     """Run the sim for baseline / rest / burn against the stress enemy
     (from the game-state `upcoming_boss`/`upcoming_bb_*` fields, passed
     as `enemy_key`). Return a list of (label, loot_type, winrate, hp_end)
     tuples sorted best-first.
 
-    Food option is NOT yet simmed here — it needs setup.receivingBoosts
-    and the food-application framework.
+    If `foods` is provided, all sim variants include the food effects
+    (models the pre-fight food dump).
     """
     results = []
 
     base_wr, base_hp_loss, base_mean_hp = await _sim_big_baddie_survival(
         dices, biome, current_hp, max_hp, trials=40, enemy_key=enemy_key,
+        foods=foods,
     )
     base_hp_end = int(base_mean_hp)
     results.append(("baseline", None, base_wr, base_hp_end))
@@ -2396,6 +2407,7 @@ async def _sim_campfire_options(
     rest_hp = min(max_hp, current_hp + int(max_hp * 0.4))
     rest_wr, rest_hp_loss, rest_mean_hp = await _sim_big_baddie_survival(
         dices, biome, rest_hp, max_hp, trials=40, enemy_key=enemy_key,
+        foods=foods,
     )
     rest_hp_end = int(rest_mean_hp)
     results.append(("rest", "pick-rest", rest_wr, rest_hp_end))
@@ -2404,7 +2416,7 @@ async def _sim_campfire_options(
     if burn_dices:
         burn_wr, burn_hp_loss, burn_mean_hp = await _sim_big_baddie_survival(
             burn_dices, biome, current_hp, max_hp, trials=40,
-            enemy_key=enemy_key,
+            enemy_key=enemy_key, foods=foods,
         )
         burn_hp_end = int(burn_mean_hp)
         results.append(("burn", "pick-burn", burn_wr, burn_hp_end))
@@ -2513,10 +2525,17 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
                 f"  campfire: {near_bb['type']} at +{near_bb['steps_away']} "
                 f"→ {stress_label} (stress={near_bb['stress_enemy_key']})"
             )
+            # Extract player's current food for sim
+            player_foods = []
+            if isinstance(char, dict):
+                for b in (char.get("boosts") or []):
+                    if isinstance(b, dict):
+                        player_foods.append(b.get("type", ""))
             options = await _sim_campfire_options(
                 logger, dices, current_hp, max_hp, near_bb["biome"],
                 burn_die_id, burn_ability_id,
                 enemy_key=near_bb["stress_enemy_key"],
+                foods=player_foods if player_foods else None,
             )
             # Prefer burn when rest's winrate advantage is marginal AND
             # HP is healthy enough to absorb it. Below 50% HP, always
