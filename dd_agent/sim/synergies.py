@@ -211,6 +211,19 @@ def count_attack_sides(die) -> int:
     return sum(1 for a in _abilities(die) if is_attack(a))
 
 
+def _count_block_sides_on_other_dice(all_dice, self_idx) -> int:
+    """Count sides with block on all dice except self_idx."""
+    count = 0
+    for i, die in enumerate(all_dice or []):
+        if i == self_idx:
+            continue
+        for ab in _abilities(die):
+            label = (ab.get("label") or "").lower()
+            if "block" in label:
+                count += 1
+    return count
+
+
 def count_poison_sides(die) -> int:
     return sum(1 for a in _abilities(die) if is_poison(a))
 
@@ -512,6 +525,17 @@ COMBO_RULES = [
                     "and competes with actual block sides.",
         check=lambda target_die, side, all_dice, idx: (
             "block equal to largest attack" in _label(side)
+        ),
+    ),
+    ComboRule(
+        name="attack_equal_to_block_situational",
+        bonus=0.2,
+        description="PENALTY: 'Attack equal to Block' is too situational — only good "
+                    "when most other dice provide block. Without heavy block from other "
+                    "dice this side outputs near-zero damage.",
+        check=lambda target_die, side, all_dice, idx: (
+            "attack equal to block" in _label(side)
+            and _count_block_sides_on_other_dice(all_dice, idx) < 6
         ),
     ),
     # ============================================================
