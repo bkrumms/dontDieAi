@@ -219,6 +219,12 @@ def score_side_for_die(
 
     score = base * fit
 
+    # Exhaust attack sides on the defense die are acceptable — they fire
+    # once then the die goes back to blocking on subsequent turns.
+    is_exhaust = bool(side.get("isExhaust") or "(e)" in (side.get("label") or ""))
+    if role == "defense" and category == "attack" and is_exhaust:
+        score = base * 1.0
+
     # Curse = hard veto regardless of tier
     if category == "curse":
         return -1000.0, ["CURSE"]
