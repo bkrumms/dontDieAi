@@ -2657,28 +2657,9 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
                               boostMeta={"boostId": best_id})
                 )
         else:
-            # total_after <= MAX_FOODS, no discard needed — just pick best
-            best = None
-            best_score = -1
-            for b in setup_recv:
-                if not isinstance(b, dict):
-                    continue
-                ftype = b.get("type") or ""
-                score = _FOOD_VALUE.get(ftype, 50)
-                if score > best_score:
-                    best_score = score
-                    best = b
-            if best is not None:
-                best_id = best.get("uuid") or best.get("id")
-                best_type = best.get("type") or "?"
-                logger.log(f"    pick-boost: keeping {best_type}")
-                await try_call(
-                    logger, f"it{iteration:03d}_campfire_pick-boost",
-                    dd._post("/api/game/campfire/loot",
-                              sessionId=session_id,
-                              lootType="pick-boost",
-                              boostMeta={"boostId": best_id})
-                )
+            # total_after <= MAX_FOODS: choose-boost already added both
+            # incoming foods. No discard or pick-boost needed.
+            logger.log(f"    no overflow — choose-boost added both foods")
         # choose-boost flow complete — exit campfire, don't fall through to rest
         await try_call(
             logger, f"it{iteration:03d}_campfire_exit",
