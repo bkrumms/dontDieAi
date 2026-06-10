@@ -1,0 +1,52 @@
+services:
+  ollama:
+    image: ollama/ollama
+    volumes:
+      # Models stored in a named volume — Ollama has no access to the host filesystem
+      - ollama_data:/root/.ollama
+    # Port intentionally NOT exposed to host; bot reaches it via internal Docker network
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    # GPU passthrough (optional): uncomment if you have an NVIDIA GPU + nvidia-container-toolkit
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  ollama-init:
+    image: ollama/ollama
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["ollama", "pull", "hermes3"]
+    restart: "no"
+
+  bot:
+    build: .
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-init:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    environment:
+      # Overrides the .env value so the bot reaches Ollama on the internal Docker network
+      - HERMES_BASE_URL=http://ollama:11434/v1
+    volumes:
+      # Persist runtime data (hermes logs, etc.) to the host project folder
+      - ./data:/app/data
+    restart: unless-stopped
+
+volumes:
+  ollama_data:

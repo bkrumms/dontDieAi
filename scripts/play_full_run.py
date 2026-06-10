@@ -57,7 +57,77 @@ MAX_ITERATIONS = 300
 BATTLE_TURN_LIMIT = 40
 SAME_STATE_LIMIT = 3
 CALL_DELAY = 1.0   # seconds between API calls (Cloudflare 429 kicks in ~500ms bursts)
+USER_PROMPT_TIMEOUT = 120  # seconds — bot waits this long for an interactive answer
 _last_call_time = [0.0]
+
+# Bot-mode end_reasons that mean "the bot can't proceed but the run is
+# still alive on DD's side". The bot must NEVER auto-forfeit these —
+# the user owns the run and will recover manually. See
+# feedback_no_auto_forfeit.md. user_timeout_* belongs here too: if the
+# user doesn't answer an interactive prompt in USER_PROMPT_TIMEOUT, the
+# run goes stuck (no auto-pick).
+STUCK_END_REASONS = {
+    "stuck",
+    "state_fetch_failed",
+    "iteration_cap",
+    "active_session_exists",
+    "user_timeout",
+}
+
+
+class RunStuck(Exception):
+    """Raised in bot mode (forfeit_on_exit=False) when the run can't
+    continue but the DD session is still alive. The bot caller is
+    responsible for marking the run stuck and notifying the user.
+
+    Also used for user_timeout_<kind> end_reasons when the user doesn't
+    respond to an interactive prompt within USER_PROMPT_TIMEOUT.
+    """
+
+    def __init__(self, end_reason: str, session_id: str | None, summary: dict | None = None):
+        super().__init__(f"run stuck: {end_reason} (session={session_id})")
+        self.end_reason = end_reason
+        self.session_id = session_id
+        self.summary = summary or {}
+
+
+async def _ask_user_or_stuck(prompt_cb, prompt: dict, session_id: str | None):
+    """Call the bot's prompt callback and return the user's choice. If
+    the callback returns None (timeout / no answer), raise RunStuck so
+    the bot marks the run stuck. The DD session stays alive — the user
+    can take over manually. See feedback_no_auto_forfeit.md.
+    """
+    if prompt_cb is None:
+        # Defensive: caller forgot to pass prompt_cb but interactivity > 0.
+        raise RunStuck("user_timeout_no_callback", session_id)
+    answer = await prompt_cb(prompt)
+    if answer is None:
+        raise RunStuck(f"user_timeout_{prompt.get('kind', 'unknown')}", session_id)
+    return answer
+
+
+# Contextvars so deep helpers (walk_loot_steps, handle_mystery, etc.)
+# can access interactivity + prompt_cb without us threading them through
+# 5 layers of function signatures.
+import contextvars as _cv
+_interactivity_ctx: _cv.ContextVar[int] = _cv.ContextVar("dd_interactivity", default=0)
+_prompt_cb_ctx: _cv.ContextVar = _cv.ContextVar("dd_prompt_cb", default=None)
+_session_id_ctx: _cv.ContextVar = _cv.ContextVar("dd_session_id", default=None)
+
+
+def _interactivity() -> int:
+    return _interactivity_ctx.get()
+
+
+async def _ask_if_level(min_level: int, prompt: dict):
+    """Convenience: if current interactivity is below `min_level`, return
+    None (caller falls back to autonomous logic). Otherwise prompt the
+    user; raise RunStuck on timeout."""
+    if _interactivity() < min_level:
+        return None
+    return await _ask_user_or_stuck(
+        _prompt_cb_ctx.get(), prompt, _session_id_ctx.get(),
+    )
 
 
 class RunLogger:
@@ -66,6 +136,8 @@ class RunLogger:
         self.out_dir.mkdir(parents=True, exist_ok=True)
         self.step = 0
         self.summary = {"battles": [], "iterations": 0, "end_reason": None}
+        # Ring buffer of last 10 API calls for stuck/error diagnostics
+        self._recent_calls: list[dict] = []
 
     def save(self, label: str, data):
         self.step += 1
@@ -112,6 +184,9 @@ async def try_call(logger, label, coro, max_retries: int = 3):
     try:
         r = await coro
         logger.save(label, r)
+        logger._recent_calls.append({"label": label, "status": 200, "body": None})
+        if len(logger._recent_calls) > 10:
+            logger._recent_calls.pop(0)
         return r
     except httpx.HTTPStatusError as e:
         body = None
@@ -119,20 +194,27 @@ async def try_call(logger, label, coro, max_retries: int = 3):
             body = e.response.text
         except Exception:
             pass
-        msg = f"HTTP {e.response.status_code}: {body or ''}"
+        status = e.response.status_code
+        msg = f"HTTP {status}: {body or ''}"
         logger.log(f"ERROR {label}: {msg[:400]}")
-        logger.save(f"{label}_ERROR", {"status": e.response.status_code, "body": body})
+        logger.save(f"{label}_ERROR", {"status": status, "body": body})
+        logger._recent_calls.append({"label": label, "status": status, "body": (body or "")[:300]})
+        if len(logger._recent_calls) > 10:
+            logger._recent_calls.pop(0)
         # Cloudflare 429: back off hard so subsequent calls can succeed.
-        if e.response.status_code == 429:
+        if status == 429:
             backoff = 15.0
             logger.log(f"  [429 backoff {backoff}s]")
             await asyncio.sleep(backoff)
-            # Also push _last_call_time forward so the next call waits too.
             _last_call_time[0] = time.monotonic()
         return None
     except Exception as e:
-        logger.log(f"ERROR {label}: {type(e).__name__}: {e}")
-        logger.save(f"{label}_ERROR", {"error": f"{type(e).__name__}: {e}"})
+        err_str = f"{type(e).__name__}: {e}"
+        logger.log(f"ERROR {label}: {err_str}")
+        logger.save(f"{label}_ERROR", {"error": err_str})
+        logger._recent_calls.append({"label": label, "status": "exception", "body": err_str[:300]})
+        if len(logger._recent_calls) > 10:
+            logger._recent_calls.pop(0)
         return None
 
 
@@ -1828,10 +1910,35 @@ async def walk_loot_steps(dd, logger, session_id, battle_num, required_steps, in
             if isinstance(char, dict):
                 dices = char.get("dices") or []
 
-            # Use die-selection heuristic — biome-aware so the offered
-            # pool (Ice Cave → defensive, Volcano → offensive, Toxic
-            # Swamp → poison) lands on the matching die role.
+            # Default: biome-aware autonomous die pick.
             die_idx = choose_die_for_upgrade(dices, biome=biome)
+
+            # Level 2+: ask the user which die to upgrade.
+            if _interactivity() >= 2 and dices:
+                bot_pick = die_idx
+                options = []
+                for i, d in enumerate(dices):
+                    sides = len(d.get("ability") or [])
+                    role = DIE_ROLES.get(i, "mixed")
+                    marker = " ← bot's pick" if i == bot_pick else ""
+                    options.append({
+                        "value": str(i),
+                        "label": f"Die {i+1} — {role}, {sides} sides{marker}",
+                    })
+                ans = await _ask_if_level(2, {
+                    "kind": "pick_die",
+                    "text": (
+                        f"**Loot — pick which die to upgrade.** "
+                        f"(Battle #{battle_num}, biome: {biome or 'neutral'})"
+                    ),
+                    "options": options,
+                })
+                if ans is not None:
+                    try:
+                        die_idx = int(ans)
+                    except Exception:
+                        pass
+
             picked_die_index = die_idx
             picked_die_id = None
             if dices and die_idx < len(dices):
@@ -1985,12 +2092,64 @@ async def walk_loot_steps(dd, logger, session_id, battle_num, required_steps, in
                         f"    [{orig_i}] {lbl}  ({tier}/{cat})  score={s:.1f}{combo_str}{mark}"
                     )
 
+                # Shadow-observe this decision with Hermes (fire-and-forget)
+                try:
+                    from dd_agent.hermes import shadow_pick as _hermes_shadow
+                    _hermes_shadow(
+                        die_idx_for_score,
+                        pick_abilities,
+                        rule_scored=scored,
+                        rule_best_side=best_side if not skip_upgrade else None,
+                        game_state=ctx_char,
+                    )
+                except Exception:
+                    pass
+
                 if skip_upgrade:
                     ability_id = None
                     picked_ability_label = "(skipped — dilutive)"
                 elif best_side and isinstance(best_side, dict):
                     ability_id = best_side.get("uuid") or best_side.get("id")
                     picked_ability_label = best_side.get("label")
+
+                # Level 2+: let the user override the side pick.
+                if _interactivity() >= 2 and pick_abilities:
+                    bot_top_idx = (scored[0][0] if scored else 0) if not skip_upgrade else None
+                    options = []
+                    score_by_orig = {orig_i: s for (orig_i, _, s, _, _, _) in scored}
+                    # Cap at 5 sides — Discord allows 25 buttons but
+                    # cluttered UI; DD usually offers 3 anyway.
+                    for i, ab in enumerate(pick_abilities[:5]):
+                        if not isinstance(ab, dict):
+                            continue
+                        lbl = (ab.get("label") or f"Side {i+1}").strip()
+                        score = score_by_orig.get(i)
+                        marker = " ← bot's pick" if i == bot_top_idx else ""
+                        suffix = f" [{score:.0f}]" if score is not None else ""
+                        full = f"{lbl}{suffix}{marker}"
+                        options.append({"value": str(i), "label": full[:80]})
+                    options.append({"value": "skip", "label": "Skip upgrade"})
+                    ans = await _ask_if_level(2, {
+                        "kind": "pick_ability",
+                        "text": (
+                            f"**Pick a side for Die {picked_die_index + 1 if picked_die_index is not None else '?'}.** "
+                            f"Numbers in [..] are the bot's score (higher = better in its model)."
+                        ),
+                        "options": options,
+                    })
+                    if ans == "skip":
+                        ability_id = None
+                        picked_ability_label = "(user skipped)"
+                        skip_upgrade = True
+                    elif ans is not None:
+                        try:
+                            sel = int(ans)
+                            chosen = pick_abilities[sel]
+                            ability_id = chosen.get("uuid") or chosen.get("id")
+                            picked_ability_label = chosen.get("label")
+                            skip_upgrade = False
+                        except Exception:
+                            pass
             logger.log(f"    pick-ability -> {picked_ability_label} ({ability_id})")
 
             if ability_id is not None:
@@ -2565,15 +2724,37 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
                             f"rest HP end {best[3]} >> burn HP end {burn_opt[3]} "
                             f"— keeping rest (need HP for later fights)"
                         )
-            # When ALL options have sub-50% winrate, neither rest nor burn
-            # will reliably save the run. Pick food instead — a lucky pull
-            # (Godmode Guac, Brrrito, etc.) can completely flip the fight.
-            if best[2] < 0.50:
-                logger.log(
-                    f"    all sim options below 50% (best={best[0]}@{best[2]:.0%}) "
-                    f"— choosing food (hail mary)"
+            # When ALL options have very low winrate, pick food as hail mary.
+            # Threshold lowered from 50% to 20%: between 20-50%, rest is still
+            # the best play (HP buffer matters more than random food). 3 of 4
+            # Ganondwarf losses chose food over rest at 12-45% — rest would
+            # have given them a real chance.
+            if best[2] < 0.20:
+                # Quality-filter: only take food if the campfire offers
+                # something impactful. Junk food (Scorch Sauce, Snackrifice,
+                # Toxipop) won't flip a sub-20% fight — rest is still better.
+                _good_foods = {
+                    "Godmode Guac", "Brotein Bar MAX", "Giga Juice",
+                    "Ice Rice", "Brrrito Blockerito", "Boom Beans",
+                    "Pickle", "Rage Shake", "Clutch Creme",
+                }
+                recv = (setup.get("receivingBoosts") or []) if isinstance(setup, dict) else []
+                has_good_food = any(
+                    (b.get("type") or "") in _good_foods
+                    for b in recv if isinstance(b, dict)
                 )
-                sim_override = ("choose-boost", f"sim hopeless ({best[0]}={best[2]:.0%}@{best[3]}), food hail mary")
+                if has_good_food:
+                    logger.log(
+                        f"    all sim options below 20% (best={best[0]}@{best[2]:.0%}) "
+                        f"— choosing food (hail mary, good food available)"
+                    )
+                    sim_override = ("choose-boost", f"sim hopeless ({best[0]}={best[2]:.0%}@{best[3]}), food hail mary")
+                else:
+                    logger.log(
+                        f"    all sim options below 20% (best={best[0]}@{best[2]:.0%}) "
+                        f"but only junk food offered — choosing rest instead"
+                    )
+                    sim_override = ("pick-rest", f"sim hopeless but junk food, rest safer")
             elif best[1] is None:  # baseline won — fall through to rest
                 sim_override = ("pick-rest", f"sim baseline@{best[3]}, rest as safe default")
             else:
@@ -2586,6 +2767,38 @@ async def handle_campfire(dd, logger, session_id, character_id, iteration, char)
         loot_type, reason = strategy(
             hp_pct, current_hp, max_hp, carrying_curse, has_burn_target
         )
+
+    # Level 3+: let the user pick rest vs burn at the campfire.
+    # Per memory, only those two options matter; food/points/mine are skipped.
+    if _interactivity() >= 3:
+        bot_pick = "burn" if loot_type == "pick-burn" else "rest"
+        rest_label = "Rest (heal 40%)"
+        burn_label_short = (
+            f"Burn ({burn_label[:30]})" if has_burn_target and burn_label else "Burn (no target)"
+        )
+        if bot_pick == "rest":
+            rest_label += " ← bot's pick"
+        else:
+            burn_label_short += " ← bot's pick"
+        ctx = {
+            "hp": current_hp, "max_hp": max_hp,
+            "points": None,  # not in scope
+        }
+        opts = [{"value": "rest", "label": rest_label}]
+        if has_burn_target:
+            opts.append({"value": "burn", "label": burn_label_short})
+        ans = await _ask_if_level(3, {
+            "kind": "campfire_pick",
+            "text": (
+                f"**Campfire.** Bot's reasoning: `{reason}`."
+            ),
+            "options": opts,
+            "context": ctx,
+        })
+        if ans == "rest":
+            loot_type, reason = ("pick-rest", "user picked rest")
+        elif ans == "burn" and has_burn_target:
+            loot_type, reason = ("pick-burn", "user picked burn")
 
     logger.log(f"  campfire decision ({RUN_GOAL}): {loot_type} ({reason})")
 
@@ -2728,6 +2941,36 @@ async def handle_bub(dd, logger, session_id, character_id, iteration):
     items = setup.get("shopItems") or []
     burns_done = setup.get("burns", 0)
     logger.log(f"  bub shop: {len(items)} items, burns_done={burns_done}")
+
+    # Level 3+: let the user opt out of the entire Bub stop. (Granular
+    # per-item picking would be too noisy in chat for what's usually a
+    # 4-5 item shop. Take = run autonomous shop logic; skip = exit.)
+    if _interactivity() >= 3:
+        item_lines = []
+        for it in items[:6]:
+            if not isinstance(it, dict):
+                continue
+            payload = it.get("payload") or {}
+            label = payload.get("label") if isinstance(payload, dict) else str(payload)
+            item_lines.append(f"  • [{it.get('type')}] {it.get('price')}g — {label}")
+        ans = await _ask_if_level(3, {
+            "kind": "bub_takeskip",
+            "text": (
+                f"**Bub's shop** ({len(items)} items, {burns_done} burns done).\n"
+                + "\n".join(item_lines) +
+                "\n\nTake the stop (autonomous burn + buy) or skip?"
+            ),
+            "options": [
+                {"value": "take", "label": "Take stop ← bot's pick"},
+                {"value": "skip", "label": "Skip"},
+            ],
+        })
+        if ans == "skip":
+            await try_call(
+                logger, f"it{iteration:03d}_bub_exit_user",
+                dd._post("/api/game/bub/exit", sessionId=session_id)
+            )
+            return
     for it in items[:15]:
         if isinstance(it, dict):
             payload = it.get("payload") or {}
@@ -3100,11 +3343,16 @@ def _food_for_enemy(monsters: list, foods: list) -> tuple:
 
     profile = _score_monster_threats(monsters)
 
-    # Skip chaff fights — food is too valuable to burn on small baddies.
+    # Skip fights where food doesn't meaningfully change the outcome.
+    # Sim data (200 trials, mid-Ch1 build with 4 upgrades):
+    #   <100 total HP: 90-100% WR without food, HP diff +5 to +16 (negligible)
+    #   100+ total HP: 74-92% WR without food, HP diff +21 to +31 (meaningful)
+    #   Bosses/big-baddies: 9% WR without food, must eat
+    # Threshold: only activate food on bosses OR fights with total_hp >= 100
+    # OR fights with dangerous debuffs (poison/bleed/curse can chain-kill).
     dangerous = (
         profile["any_boss"]
-        or profile["total_hp"] >= 60
-        or profile["total_dmg"] >= 20
+        or profile["total_hp"] >= 100
         or profile["total_poison"] >= 3
         or profile["total_bleed"] >= 3
         or profile["total_curse"] >= 1
@@ -3254,6 +3502,26 @@ async def handle_mystery(dd, logger, session_id, iteration, setup, character_id=
         skippable = bool(setup.get("skippable", True))
 
     logger.log(f"  mystery event='{event}' skippable={skippable}")
+
+    # Level 3+: ask the user before any event-specific logic runs.
+    # Skippable-only — non-skippable events have to be played out.
+    if _interactivity() >= 3 and skippable:
+        bot_default = "skip" if event in ("Double Down", "Poisoned Veins") else "take"
+        ans = await _ask_if_level(3, {
+            "kind": "mystery_takeskip",
+            "text": f"**Mystery event:** {event or '(unknown)'}\nTake or skip?",
+            "options": [
+                {"value": "take", "label": "Take" + (" ← bot's pick" if bot_default == "take" else "")},
+                {"value": "skip", "label": "Skip" + (" ← bot's pick" if bot_default == "skip" else "")},
+            ],
+        })
+        if ans == "skip":
+            await try_call(
+                logger, f"it{iteration:03d}_mystery_exit_user",
+                dd._post("/api/game/mystery/exit", sessionId=session_id),
+            )
+            return
+        # ans == "take": fall through to event-specific logic below
 
     # ---- skippable events we SKIP ----
     if event in ("Double Down", "Poisoned Veins"):
@@ -3782,26 +4050,95 @@ def _yin_yang_target(dices):
     return (None, None, None)
 
 
-async def play_full_run(dd, character_id, out_dir):
+async def play_full_run(dd, character_id, out_dir, *, forfeit_on_exit: bool = True,
+                        event_cb=None, interactivity: int = 0, prompt_cb=None,
+                        existing_session_id: str | None = None):
+    """Play one autonomous run end-to-end.
+
+    Args:
+      dd: DDClient instance (already authed).
+      character_id: DD character UUID.
+      out_dir: directory for per-call JSON logs + _summary.json.
+      forfeit_on_exit: if True (default, sim batch behavior), force-forfeit
+        the session on ANY exit including stuck/error. If False (bot mode),
+        leave the session alive on DD's side and raise RunStuck on
+        unrecoverable states. NEVER auto-forfeits in bot mode — see
+        feedback_no_auto_forfeit.md.
+      event_cb: optional async callable invoked on key lifecycle events
+        (currently: session_started, battle_won, battle_lost, run_ended).
+        Signature: async def cb(event: dict) -> None.
+      interactivity: 0 = fully autonomous (default). 1 = ask at checkpoints.
+        2 = + ask at die upgrades. 3 = + ask at mystery / campfire / Bub's.
+        4 = + ask at map rerolls. 5 = companion mode (separate code path,
+        not handled here). When > 0, prompt_cb is required.
+      prompt_cb: optional async callable. Signature:
+        async def cb(prompt: dict) -> str | None
+        prompt has {kind, text, options:[{value,label}], context}. Returns
+        the chosen value, or None on timeout. None → run goes stuck (no
+        auto-pick, no auto-forfeit).
+      existing_session_id: when set, skip start_session and attach to the
+        given DD session. Used by the Restart button after a stuck run —
+        the DD session is still alive, we just want to resume driving it.
+        Caller must verify the session is alive before calling.
+
+    Returns:
+      The summary dict (logger.summary) on natural completion.
+
+    Raises:
+      RunStuck: bot mode only, on stuck/error end_reasons.
+    """
     logger = RunLogger(out_dir)
     logger.log(f"starting full run, character_id={character_id}")
 
-    existing = await try_call(logger, "precheck_game", dd.get_game(character_id))
+    async def _emit(event: dict):
+        if event_cb is None:
+            return
+        try:
+            await event_cb(event)
+        except Exception as e:
+            logger.log(f"  [event_cb error: {type(e).__name__}: {e}]")
+
+    # Resume mode: skip the precheck/zombie/start-session block and use
+    # the caller-supplied session id directly. The caller is responsible
+    # for verifying the session is still alive.
+    if existing_session_id:
+        logger.log(f"[resume] attaching to existing session {existing_session_id}")
+        session_id = existing_session_id
+        logger.summary["session_id"] = session_id
+        logger.summary["resumed"] = True
+        await _emit({"kind": "session_started", "session_id": session_id,
+                     "character_id": character_id, "resumed": True})
+        # Skip the start_session block by jumping straight to the loop body.
+        # We accomplish this by setting a flag that bypasses the precheck below.
+        _resume_mode = True
+    else:
+        _resume_mode = False
+
+    existing = None if _resume_mode else await try_call(
+        logger, "precheck_game", dd.get_game(character_id),
+    )
     if isinstance(existing, dict):
         last = existing.get("lastSession") or {}
         progress = last.get("progress") or {}
         in_state = progress.get("inState")
         if in_state and in_state not in ("dead", "lost", "won", "ended", "forfeited", "lose", "win"):
-            # Zombie session from a crashed previous run. Force-forfeit it
-            # using the leftover session id before starting a fresh one.
             zombie_session_id = last.get("sessionId") or last.get("session_id")
+            if not forfeit_on_exit:
+                # Bot mode: never touch a live session that isn't ours.
+                logger.log(
+                    f"[abort] live session exists (inState={in_state}) "
+                    f"session_id={zombie_session_id}; bot mode refuses to forfeit"
+                )
+                logger.summary["end_reason"] = "active_session_exists"
+                logger.summary["session_id"] = zombie_session_id
+                logger.write_summary()
+                raise RunStuck("active_session_exists", zombie_session_id, logger.summary)
+            # Sim mode: zombie session from a crashed prior run. Force-forfeit.
             logger.log(
                 f"[recover] active session (inState={in_state}) "
                 f"session_id={zombie_session_id}; forfeiting"
             )
             if zombie_session_id:
-                # Retry forfeit up to 4 times with escalating backoff so
-                # Cloudflare 429s don't leave a zombie.
                 for attempt in range(4):
                     r = await try_call(
                         logger, f"precheck_forfeit_{attempt}",
@@ -3810,7 +4147,6 @@ async def play_full_run(dd, character_id, out_dir):
                     if r is not None:
                         break
                     await asyncio.sleep(10 * (attempt + 1))
-            # Re-check state after forfeit.
             existing2 = await try_call(
                 logger, "precheck_game_after_forfeit",
                 dd.get_game(character_id),
@@ -3826,27 +4162,39 @@ async def play_full_run(dd, character_id, out_dir):
                     )
                     logger.summary["end_reason"] = "active_session_exists"
                     logger.write_summary()
-                    return
+                    return logger.summary
 
-    session = await try_call(logger, "start_session",
-                              dd.start_session(character_id=character_id,
-                                                equipped=[], time_crystals=0))
-    if not session:
-        logger.summary["end_reason"] = "start_session_failed"
-        logger.write_summary()
-        return
+    if not _resume_mode:
+        session = await try_call(logger, "start_session",
+                                  dd.start_session(character_id=character_id,
+                                                    equipped=[], time_crystals=0))
+        if not session:
+            logger.summary["end_reason"] = "start_session_failed"
+            logger.write_summary()
+            if not forfeit_on_exit:
+                raise RunStuck("start_session_failed", None, logger.summary)
+            return logger.summary
 
-    session_id = None
-    if isinstance(session, dict):
-        session_id = session.get("sessionId") or session.get("session_id")
-    if not session_id:
-        logger.log("no session_id returned from start-session")
-        logger.summary["end_reason"] = "no_session_id"
-        logger.write_summary()
-        return
+        session_id = None
+        if isinstance(session, dict):
+            session_id = session.get("sessionId") or session.get("session_id")
+        if not session_id:
+            logger.log("no session_id returned from start-session")
+            logger.summary["end_reason"] = "no_session_id"
+            logger.write_summary()
+            if not forfeit_on_exit:
+                raise RunStuck("no_session_id", None, logger.summary)
+            return logger.summary
 
-    logger.log(f"session_id={session_id}")
-    logger.summary["session_id"] = session_id
+        logger.log(f"session_id={session_id}")
+        logger.summary["session_id"] = session_id
+        await _emit({"kind": "session_started", "session_id": session_id, "character_id": character_id})
+
+    # Bind context for interactive helpers (walk_loot_steps, handle_*).
+    # Tokens let us reset on exit so concurrent runs don't leak context.
+    _interactivity_token = _interactivity_ctx.set(int(interactivity or 0))
+    _prompt_cb_token = _prompt_cb_ctx.set(prompt_cb)
+    _session_id_token = _session_id_ctx.set(session_id)
     battle_num = 0
     last_state = None
     same_state_count = 0
@@ -3868,6 +4216,13 @@ async def play_full_run(dd, character_id, out_dir):
 
             if not game or not char:
                 end_reason = "state_fetch_failed"
+                logger.summary["stuck_info"] = {
+                    "stuck_state": "state_fetch_failed",
+                    "iteration": iteration,
+                    "game_missing": game is None,
+                    "char_missing": char is None,
+                    "recent_calls": list(logger._recent_calls),
+                }
                 break
 
             if isinstance(char, dict) and char.get("health", 1) <= 0:
@@ -3896,15 +4251,40 @@ async def play_full_run(dd, character_id, out_dir):
             # the server blocks all other actions until we answer.
             checkpoint_pending = progress.get("checkpointPending") or 0
             if checkpoint_pending > 0:
-                logger.log(f"  checkpoint pending={checkpoint_pending}; selecting 'yes' (continue)")
+                if interactivity >= 1:
+                    answer = await _ask_user_or_stuck(
+                        prompt_cb,
+                        {
+                            "kind": "checkpoint_pending",
+                            "text": (
+                                "**Mid-chapter checkpoint.** "
+                                "Continue the run, or stop here?"
+                            ),
+                            "options": [
+                                {"value": "yes", "label": "Continue"},
+                                {"value": "no", "label": "Stop"},
+                            ],
+                            "context": {
+                                "hp": hp, "max_hp": max_hp, "points": pts,
+                                "position": current_idx,
+                            },
+                        },
+                        session_id,
+                    )
+                else:
+                    answer = "yes"
+                logger.log(f"  checkpoint pending={checkpoint_pending}; user/auto answer={answer}")
                 await try_call(
-                    logger, f"it{iteration:03d}_checkpoint_yes",
+                    logger, f"it{iteration:03d}_checkpoint_{answer}",
                     dd._post(
                         "/api/game/checkpoint",
                         session_id=session_id,
-                        selection="yes",
+                        selection=answer,
                     )
                 )
+                if answer == "no":
+                    end_reason = "user_checkpoint_stop"
+                    break
                 continue
 
             # stuck detector
@@ -3917,6 +4297,15 @@ async def play_full_run(dd, character_id, out_dir):
             if same_state_count >= SAME_STATE_LIMIT:
                 logger.log(f"stuck on {state_tuple} for {SAME_STATE_LIMIT}; bailing")
                 end_reason = "stuck"
+                logger.summary["stuck_info"] = {
+                    "stuck_state": in_state,
+                    "stuck_pos": current_idx,
+                    "iteration": iteration,
+                    "hp": hp,
+                    "max_hp": max_hp,
+                    "pts": pts,
+                    "recent_calls": list(logger._recent_calls),
+                }
                 break
 
             if in_state in ("baddie", "big-baddie", "boss-baddie", "obelisk"):
@@ -3934,6 +4323,14 @@ async def play_full_run(dd, character_id, out_dir):
                     chapter=current_chapter,
                 )
                 logger.log(f"  battle result: {result}")
+                last_battle = (logger.summary.get("battles") or [{}])[-1]
+                await _emit({
+                    "kind": f"battle_{result}",
+                    "battle_num": battle_num,
+                    "monsters": last_battle.get("monsters"),
+                    "hp_at_end": last_battle.get("hp_at_end"),
+                    "turns": last_battle.get("turns"),
+                })
                 if result in ("lost", "error"):
                     end_reason = f"battle_{result}"
                     break
@@ -3998,6 +4395,30 @@ async def play_full_run(dd, character_id, out_dir):
                         )
                     except Exception as e:
                         logger.log(f"  reroll decision failed: {type(e).__name__}: {e}")
+
+                # Level 4+: let the user override the reroll/proceed decision.
+                # Bot's recommendation comes from _should_reroll_movement above.
+                if interactivity >= 4:
+                    bot_pick = "reroll" if should_reroll else "proceed"
+                    ans = await _ask_user_or_stuck(
+                        prompt_cb,
+                        {
+                            "kind": "map_reroll",
+                            "text": (
+                                f"**Movement landed on a rewindable tile.** "
+                                f"Bot recommends: `{bot_pick}` "
+                                f"(based on tile EV vs reroll cost). "
+                                f"Position: `{current_idx}`."
+                            ),
+                            "options": [
+                                {"value": "reroll", "label": "Reroll" + (" ← bot's pick" if bot_pick == "reroll" else "")},
+                                {"value": "proceed", "label": "Proceed" + (" ← bot's pick" if bot_pick == "proceed" else "")},
+                            ],
+                            "context": {"hp": hp, "max_hp": max_hp, "points": pts, "position": current_idx},
+                        },
+                        session_id,
+                    )
+                    should_reroll = (ans == "reroll")
                 if should_reroll:
                     logger.log("  rerolling movement (TC spend, 1/movement)")
                     r = await try_call(
@@ -4019,10 +4440,38 @@ async def play_full_run(dd, character_id, out_dir):
                     # Committed to a tile — future rolls may reroll again.
                     already_rerolled_this_move = False
             elif in_state == "checkpoint":
-                await try_call(logger, f"it{iteration:03d}_checkpoint_unstake",
-                                dd.checkpoint_tournament(session_id, "unstake"))
-                end_reason = "checkpoint_unstake"
-                break
+                if interactivity >= 1:
+                    answer = await _ask_user_or_stuck(
+                        prompt_cb,
+                        {
+                            "kind": "checkpoint_tournament",
+                            "text": (
+                                "**Tournament checkpoint.** "
+                                "Stake (risk what you've earned for more rewards) "
+                                "or unstake (lock in current rewards and end run)?"
+                            ),
+                            "options": [
+                                {"value": "stake", "label": "Stake (continue)"},
+                                {"value": "unstake", "label": "Unstake (end run)"},
+                            ],
+                            "context": {
+                                "hp": hp, "max_hp": max_hp, "points": pts,
+                                "position": current_idx,
+                            },
+                        },
+                        session_id,
+                    )
+                else:
+                    answer = "unstake"
+                await try_call(
+                    logger, f"it{iteration:03d}_checkpoint_{answer}",
+                    dd.checkpoint_tournament(session_id, answer),
+                )
+                if answer == "unstake":
+                    end_reason = "checkpoint_unstake"
+                    break
+                # stake → keep looping
+                continue
             else:
                 logger.log(f"unknown state: {in_state}; trying proceed")
                 r = await try_call(logger, f"it{iteration:03d}_proceed_unknown",
@@ -4031,17 +4480,36 @@ async def play_full_run(dd, character_id, out_dir):
                     # If even proceed fails, increment stuck counter
                     pass
     finally:
-        logger.log("cleanup: forfeit")
-        # Retry forfeit on 429 so cloudflare cooldown doesn't leave a
-        # zombie session. Critical for batch runs.
-        for attempt in range(4):
-            r = await try_call(logger, f"final_forfeit_{attempt}", dd.forfeit(session_id))
-            if r is not None:
-                break
-            await asyncio.sleep(10 * (attempt + 1))
+        # If a RunStuck propagated out of the loop (e.g. user prompt
+        # timeout), prefer its end_reason for the summary so logs match
+        # what the bot reports to the user.
+        import sys as _sys
+        _exc_type, _exc_val, _ = _sys.exc_info()
+        if _exc_type is RunStuck and _exc_val is not None:
+            end_reason = _exc_val.end_reason
+
+        if forfeit_on_exit:
+            logger.log("cleanup: forfeit")
+            # Retry forfeit on 429 so cloudflare cooldown doesn't leave a
+            # zombie session. Critical for batch runs.
+            for attempt in range(4):
+                r = await try_call(logger, f"final_forfeit_{attempt}", dd.forfeit(session_id))
+                if r is not None:
+                    break
+                await asyncio.sleep(10 * (attempt + 1))
+        else:
+            logger.log("cleanup: leaving session alive (bot mode, forfeit_on_exit=False)")
         logger.summary["end_reason"] = end_reason
         logger.summary["total_battles"] = battle_num
         logger.write_summary()
+
+        # Reset contextvars so concurrent runs don't see stale values.
+        try:
+            _interactivity_ctx.reset(_interactivity_token)
+            _prompt_cb_ctx.reset(_prompt_cb_token)
+            _session_id_ctx.reset(_session_id_token)
+        except Exception:
+            pass
 
         # Final report
         print("\n=== RUN SUMMARY ===")
@@ -4058,6 +4526,62 @@ async def play_full_run(dd, character_id, out_dir):
             num = b.get("num")
             print(f"    #{num} [{result}] t={turns} hp_end={hp_end}  {mon}")
 
+    await _emit({"kind": "run_ended", "end_reason": end_reason, "session_id": session_id,
+                 "total_battles": battle_num})
+
+    if not forfeit_on_exit and end_reason in STUCK_END_REASONS:
+        raise RunStuck(end_reason, session_id, logger.summary)
+
+    return logger.summary
+
+
+_VAULT_REGEN_EVERY = 50  # full aggregate rebuild interval
+
+
+def _write_vault_note(out_dir: Path, summary: dict | None, run_index: int = 0) -> None:
+    """Write a single run note to the Obsidian vault. Every VAULT_REGEN_EVERY
+    runs also regenerates the aggregate notes (enemies, sides, learnings)."""
+    try:
+        from generate_vault import RunModel, write_run_note, VAULT
+        if summary is None:
+            return
+        model = RunModel(out_dir, summary)
+        write_run_note(model, VAULT)
+        # Periodic full rebuild of aggregates
+        if run_index > 0 and run_index % _VAULT_REGEN_EVERY == 0:
+            print(f"  [vault] run #{run_index} — regenerating aggregates...")
+            from generate_vault import (
+                load_runs, compute_side_stats, compute_enemy_stats,
+                compute_side_pair_stats, compute_cross_die_pair_stats,
+                compute_build_profile_stats, compute_death_pattern_stats,
+                write_side_pairs_learning, write_cross_die_pairs_learning,
+                write_build_profiles_learning, write_death_patterns_learning,
+                write_enemy_note, write_side_note, write_index,
+            )
+            runs = load_runs(min_battles=1)
+            baseline = sum(1 for r in runs if r.ch1_cleared) / len(runs) if runs else 0
+            side_stats = compute_side_stats(runs)
+            enemy_stats = compute_enemy_stats(runs)
+            pair_stats = compute_side_pair_stats(runs)
+            cross_pairs = compute_cross_die_pair_stats(runs)
+            profiles = compute_build_profile_stats(runs)
+            death_stats = compute_death_pattern_stats(runs)
+            VAULT.mkdir(parents=True, exist_ok=True)
+            write_side_pairs_learning(pair_stats, baseline, VAULT)
+            write_cross_die_pairs_learning(cross_pairs, baseline, VAULT)
+            write_build_profiles_learning(profiles, baseline, VAULT)
+            write_death_patterns_learning(death_stats, baseline, VAULT)
+            for name, data in enemy_stats.items():
+                if data["encounters"] >= 3:
+                    write_enemy_note(name, data, VAULT, baseline)
+            for side, data in side_stats.items():
+                if data["runs"] >= 3:
+                    write_side_note(side, data, pair_stats, VAULT, baseline)
+            write_index(runs, VAULT, baseline)
+            print(f"  [vault] aggregates updated ({len(runs)} runs)")
+    except Exception as e:
+        print(f"  [vault] note write failed: {e}")
+
 
 async def main():
     import argparse
@@ -4073,7 +4597,12 @@ async def main():
         character_id = args.character_id
         if not character_id:
             chars = await dd._get("/api/characters/solo")
-            character_id = chars if isinstance(chars, str) else (chars or {}).get("id")
+            character_id = (
+                chars if isinstance(chars, str)
+                else (chars or {}).get("id")
+                    or (chars or {}).get("practice")
+                    or (chars or {}).get("daily")
+            )
         if not character_id:
             print("could not determine character_id")
             return
@@ -4083,7 +4612,8 @@ async def main():
             stamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
             out_dir = Path("data/full_runs") / f"{stamp}_r{i}"
             print(f"\n>>> run #{i} logging to {out_dir}")
-            await play_full_run(dd, character_id, out_dir)
+            summary = await play_full_run(dd, character_id, out_dir)
+            _write_vault_note(out_dir, summary, run_index=i)
             if i < args.n_runs:
                 await asyncio.sleep(15)  # cool-off between runs (Cloudflare 429)
     finally:

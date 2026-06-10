@@ -10,3 +10,4 @@ data/sessions/
 data/session_*.json
 .venv/
 .claude/scheduled_tasks.lock
+bot_state.db

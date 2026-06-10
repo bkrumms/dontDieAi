@@ -1,17 +1,28 @@
 """Thin async wrapper around the Don't Die dev API.
 
-Auth scheme is TBD — the OpenAPI spec declares no securitySchemes. The client
-accepts any combination of:
-  - Bearer token  (DD_AUTH_TOKEN)
-  - Raw Cookie    (DD_COOKIE)
-  - Extra headers (DD_EXTRA_HEADERS, JSON dict in .env)
+Uses curl_cffi with Chrome TLS impersonation to bypass Cloudflare's bot
+detection. CF allows requests from origin https://dd-internal.dontdie.gg,
+so all calls include origin/referer headers pointing to the game frontend.
 
-Use whichever the dev build requires. You can find the correct header(s) in
-your browser's dev tools → Network tab while logged into the local build.
+Auth: DD_AUTH_TOKEN (raw JWT, no "Bearer" prefix). No cookie needed.
 """
-import httpx
+from __future__ import annotations
 
-from .config import DD_API_BASE, DD_AUTH_TOKEN, DD_COOKIE, DD_EXTRA_HEADERS
+import asyncio
+import json
+import urllib.parse
+
+import httpx
+from curl_cffi.requests import AsyncSession
+
+from .config import DD_API_BASE, DD_AUTH_TOKEN, DD_EXTRA_HEADERS
+
+_BASE_HEADERS = {
+    "origin": "https://dd-internal.dontdie.gg",
+    "referer": "https://dd-internal.dontdie.gg/",
+    "accept": "application/json, text/plain, */*",
+    "accept-language": "en-US,en;q=0.9",
+}
 
 
 class DDClient:
@@ -19,32 +30,66 @@ class DDClient:
         self,
         base: str = DD_API_BASE,
         token: str = DD_AUTH_TOKEN,
-        cookie: str = DD_COOKIE,
         extra_headers: dict | None = None,
     ):
-        headers: dict[str, str] = {}
+        self._base = base.rstrip("/")
+        self._headers: dict[str, str] = {**_BASE_HEADERS}
         if token:
-            # NOTE: the dev build expects the raw JWT, NOT "Bearer <token>".
-            # Prefixing with "Bearer " triggers a middleware "Invalid request".
-            headers["authorization"] = token
-        if cookie:
-            headers["Cookie"] = cookie
-        headers.update(extra_headers or DD_EXTRA_HEADERS)
-        self.http = httpx.AsyncClient(base_url=base, headers=headers, timeout=30.0)
+            self._headers["authorization"] = token
+        if extra_headers or DD_EXTRA_HEADERS:
+            # Accept any explicit overrides, but never let them clobber origin/referer.
+            safe = {k: v for k, v in (extra_headers or DD_EXTRA_HEADERS).items()
+                    if k.lower() not in ("origin", "referer")}
+            self._headers.update(safe)
+        self._session: AsyncSession | None = None
+        self._lock = asyncio.Lock()
+
+    async def _ensure_session(self) -> AsyncSession:
+        if self._session is not None:
+            return self._session
+        async with self._lock:
+            if self._session is None:
+                self._session = AsyncSession(impersonate="chrome")
+        return self._session
 
     async def close(self):
-        await self.http.aclose()
+        if self._session:
+            await self._session.close()
+            self._session = None
+
+    def _check_status(self, status: int, url: str, body: bytes) -> None:
+        if status >= 400:
+            raise httpx.HTTPStatusError(
+                f"Client error '{status}' for url '{url}'",
+                request=httpx.Request("GET", url),
+                response=httpx.Response(status, content=body),
+            )
+
+    async def _fetch(self, method: str, url: str, extra_headers: dict | None = None,
+                     body: str | None = None) -> tuple[int, bytes]:
+        session = await self._ensure_session()
+        headers = {**self._headers, **(extra_headers or {})}
+        resp = await session.request(method, url, headers=headers,
+                                     data=body, timeout=30)
+        return resp.status_code, resp.content
 
     async def _get(self, path: str, **params):
-        r = await self.http.get(path, params=params)
-        r.raise_for_status()
-        body = r.json()
-        return body.get("data", body) if isinstance(body, dict) else body
+        qs = urllib.parse.urlencode({k: v for k, v in params.items() if v is not None})
+        url = self._base + path + (f"?{qs}" if qs else "")
+        status, raw = await self._fetch("GET", url)
+        self._check_status(status, url, raw)
+        data = json.loads(raw)
+        return data.get("data", data) if isinstance(data, dict) else data
 
     async def _post(self, path: str, **body):
-        r = await self.http.post(path, json=body)
-        r.raise_for_status()
-        data = r.json()
+        url = self._base + path
+        status, raw = await self._fetch(
+            "POST", url,
+            extra_headers={"content-type": "application/json"},
+            body=json.dumps(body),
+        )
+        self._check_status(status, url, raw)
+        data = json.loads(raw)
         return data.get("data", data) if isinstance(data, dict) else data
 
     # --- reads ---

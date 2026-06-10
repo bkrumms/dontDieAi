@@ -505,6 +505,42 @@ def big_cheeze_onslaught() -> Enemy:
     )
 
 
+def deathbat() -> Enemy:
+    """Chapter 2 big-baddie (Toxic Swamp obelisk). 144 HP. Summoner.
+
+    T1: Summon Battys (not modeled — sim treats as idle)
+    T2: 6 damage
+    T3: Strength 6
+    T4: Summon (idle)
+    T5: 6 damage
+    T6: 34 damage + Heal 70
+    T7: Summon (idle)
+    T8: Strength 10
+    T9: 6 damage
+    T10+: repeat 8-9
+
+    NOTE: summon mechanic not modeled — real Deathbat fills empty slots
+    with Battys (22 HP each, attack 4-6/turn). This makes the sim
+    optimistic; the actual fight is harder due to Batty chip damage.
+    """
+    return Enemy(
+        name="Deathbat",
+        hp_base=144, hp_variance=2, points=800,
+        pattern=[
+            EnemyAction(label="Summon"),             # T1: idle (summon not modeled)
+            EnemyAction(label="6", damage=6),        # T2
+            EnemyAction(label="Str 6", self_strength=6),  # T3
+            EnemyAction(label="Summon"),             # T4: idle
+            EnemyAction(label="6", damage=6),        # T5
+            EnemyAction(label="34 + Heal 70", damage=34, rehealth=70),  # T6
+            EnemyAction(label="Summon"),             # T7: idle
+            EnemyAction(label="Str 10", self_strength=10),  # T8
+            EnemyAction(label="6", damage=6),        # T9
+        ],
+        repeat_from=7,  # T10+ loops 8-9
+    )
+
+
 ENEMIES = {
     "ice_pufflet":   ice_pufflet,
     "black_firant":  black_firant,
@@ -521,6 +557,7 @@ ENEMIES = {
     "ganondwarf":    ganondwarf,
     "pterrordactyl": pterrordactyl,
     "detonox":       detonox,
+    "deathbat":      deathbat,
     "big_cheeze_onslaught": big_cheeze_onslaught,
     "big_cheeze_shield":    big_cheeze_shield,
     "zomboid_horde":        zomboid_horde,
